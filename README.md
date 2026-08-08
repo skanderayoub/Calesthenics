@@ -8,9 +8,11 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 
 - **Shows last session's numbers** next to every set input, scoped to the session you're in (Upper A dips and Upper B dips are prescribed differently, so their histories are tracked separately).
 - **Applies the double-progression rule.** When you hit the top of a rep range on every set, at the same load, two sessions in a row, the exercise turns amber and tells you to add weight or move to the harder variation.
-- **Times your rests.** Logging a set starts the prescribed countdown, with a drain bar you can read from arm's length off the bar.
+- **Calls the deload.** Flags when two or more movements have gone backwards three sessions running, or when you've trained 6–8 weeks straight. Starting a deload week halves every set count on the Today screen, same reps, as section 7 asks.
+- **Times your rests.** Logging a set starts the prescribed countdown, with a drain bar you can read from arm's length off the bar. Holds a screen wake lock while resting, so the alarm still fires.
 - **Tracks the phase gates.** Live progress against the Phase 2 and Phase 3 entry criteria, computed from your best single set. Offers to advance you when you clear all four.
-- **Charts bodyweight** against the 0.2–0.3 kg/month target, and top sets for pull-ups and dips.
+- **Charts bodyweight** against the 0.2–0.3 kg/month target, plus top sets for pull-ups and dips and your rolling sleep average.
+- **Logs sleep, bodyweight and notes** with the session, not in a separate screen.
 
 ## Files
 
@@ -69,4 +71,6 @@ Keep `id` stable when a movement carries over between phases, or you'll lose its
 
 ## Backup
 
-Data is per-browser and per-device. Clearing site data erases it. **Data → Export JSON** whenever you care, and **Import JSON** to restore or move devices.
+Data is per-browser and per-device. Clearing site data erases it.
+
+The app asks the browser to mark its storage persistent (granted without a prompt for installed PWAs on most platforms), and nags you on the Today screen once eight sessions have accumulated since your last export. **Data → Export JSON** writes a file; **Import JSON** restores it or moves it to another device. Treat the export as the real backup — the persistence flag is a request, not a guarantee.

@@ -172,6 +172,43 @@ details.warm li{margin:6px 0}
 .flag .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--up);text-transform:uppercase;font-weight:700}
 .flag .v{font-size:13px;color:var(--ink);line-height:1.35}
 
+/* ---------- banners: deload, backup ---------- */
+.banner{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:13px;border-radius:8px;margin-bottom:14px;border:1px solid var(--line);
+}
+.banner .b-k{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;padding-top:3px;white-space:nowrap;
+}
+.banner .b-m{flex:1;font-size:13px;line-height:1.45;color:var(--muted)}
+.banner .b-m b{display:block;font-size:15px;color:var(--ink);margin-bottom:3px;font-weight:600}
+.banner .acts{display:flex;flex-direction:column;gap:6px}
+.banner .acts button{
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:8px 12px;
+  border-radius:5px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;
+}
+.banner.warn{border-color:rgba(242,169,59,.4);background:rgba(242,169,59,.06)}
+.banner.warn .b-k{color:var(--up)}
+.banner.warn .acts button:first-child{border-color:var(--up);color:var(--up)}
+.banner.info{background:var(--surface)}
+.banner.info .b-k{color:var(--go)}
+
+/* ---------- session meta: sleep, bodyweight, notes ---------- */
+.meta{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);padding:13px;margin-bottom:12px}
+.meta .row{display:flex;gap:10px;margin-bottom:11px}
+.meta .cel{flex:1;min-width:0}
+.meta label{
+  display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);margin-bottom:6px;
+}
+.meta input,.meta textarea{
+  width:100%;padding:10px;background:var(--surface2);border:1px solid var(--line);
+  border-radius:5px;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;
+}
+.meta textarea{font-family:var(--sans);min-height:66px;resize:vertical;line-height:1.45;font-size:14px}
+.meta input::placeholder,.meta textarea::placeholder{color:var(--dim)}
+
 /* ---------- buttons ---------- */
 .btn{
   display:block;width:100%;padding:15px;border-radius:7px;background:var(--go);color:#06100F;
@@ -323,7 +360,12 @@ nav button[aria-current=page]{color:var(--go)}
    ============================================================ */
 const KEY = "barlog.v1";
 const DRAFT = "barlog.v1.draft";
-const blank = { sessions: [], weights: [], settings: { phase: "phase1" } };
+const blank = {
+  version: 1,
+  sessions: [],
+  weights: [],
+  settings: { phase: "phase1", deloads: [], backupAck: 0 }
+};
 
 function load(){
   try{
@@ -339,7 +381,8 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
 let P = null;                 // program.json
 let view = "today";
 let pickedSession = null;     // session key on Today
-let draft = null;             // { phase, sessionKey, date, entries:{} }
+let draft = null;             // { phase, sessionKey, date, fp, meta, entries:{} }
+let persisted = false;        // browser agreed not to evict this origin
 
 /* ============================================================
    helpers
@@ -347,7 +390,11 @@ let draft = null;             // { phase, sessionKey, date, entries:{} }
 const $ = (s,r=document)=>r.querySelector(s);
 const el = (t,c,x)=>{const n=document.createElement(t); if(c)n.className=c; if(x!=null)n.textContent=x; return n;};
 const esc = s => String(s).replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-const today = () => new Date().toISOString().slice(0,10);
+/* Local dates, not UTC. A 00:30 session belongs to the day you trained,
+   not to yesterday in Greenwich. */
+const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const today = () => iso(new Date());
+const daysBetween = (a,b) => Math.round((new Date(b+"T00:00") - new Date(a+"T00:00"))/86400000);
 const short = d => d.slice(5).replace("-","/");
 const mmss = s => Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0");
 
@@ -363,9 +410,76 @@ function sessionsOf(ph){ return Object.keys(ph.sessions); }
 function suggested(){ return P.week[new Date().getDay()]; }
 
 /* target string, e.g. "6 × 2–3" or "4 × 20–30 s" or "4 × 8–12 / side" */
-function targetStr(ex){
+function targetStr(ex, sets){
   const r = ex.min===ex.max ? String(ex.max) : ex.min+"–"+ex.max;
-  return ex.sets+" × "+r+(ex.type==="hold"?" s":"")+(ex.perSide?" /side":"");
+  return (sets||ex.sets)+" × "+r+(ex.type==="hold"?" s":"")+(ex.perSide?" /side":"");
+}
+
+/* ============================================================
+   deload — program section 7
+   ============================================================ */
+function lastDeload(){
+  const ds = (S.settings.deloads||[]).slice().sort();
+  return ds.length ? ds[ds.length-1] : null;
+}
+function inDeloadWeek(){
+  const d = lastDeload();
+  return !!d && daysBetween(d, today()) < 7;
+}
+/* "Half the sets, same reps." */
+function effSets(ex){ return inDeloadWeek() ? Math.max(1, Math.ceil(ex.sets/2)) : ex.sets; }
+
+function firstSessionDate(){
+  return S.sessions.length ? S.sessions.map(s=>s.date).sort()[0] : null;
+}
+function weeksSinceDeload(){
+  const from = lastDeload() || firstSessionDate();
+  return from ? Math.floor(daysBetween(from, today())/7) : 0;
+}
+
+/* "Whenever your numbers go backwards two sessions in a row" — total reps
+   (or seconds) for a movement, at unchanged load, declining across three
+   consecutive sessions. Totals rather than top set, so one bad last set
+   doesn't read as a regression. */
+function regressing(sessionKey, ex){
+  const h = history(sessionKey, ex.id).slice(0,3);
+  if(h.length < 3) return false;
+  if(h[0].load !== h[1].load || h[1].load !== h[2].load) return false;
+  const tot = s => s.sets.reduce((a,v)=>a+(v||0),0);
+  return tot(h[0]) < tot(h[1]) && tot(h[1]) < tot(h[2]);
+}
+function regressions(){
+  const out = [];
+  sessionsOf(phase()).forEach(k=>{
+    phase().sessions[k].exercises.forEach(ex=>{ if(regressing(k,ex)) out.push({k,ex}); });
+  });
+  return out;
+}
+/* One regressing exercise is a bad night's sleep. Two is a pattern. */
+function deloadDue(){
+  if(inDeloadWeek()) return null;
+  const weeks = weeksSinceDeload(), list = regressions();
+  if(list.length >= 2) return { why:"regression", weeks, list };
+  if(weeks >= 8) return { why:"overdue", weeks, list };
+  if(weeks >= 6) return { why:"due", weeks, list };
+  return null;
+}
+
+/* ============================================================
+   backup nudge — localStorage is the only copy
+   ============================================================ */
+function unbackedUp(){ return S.sessions.length - (S.settings.backupAck||0); }
+function needsBackup(){ return unbackedUp() >= 8; }
+function ackBackup(){ S.settings.backupAck = S.sessions.length; save(); }
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(S,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "barlog-"+today()+".json";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  ackBackup();
+  toast("Exported");
 }
 
 /* ============================================================
@@ -419,14 +533,59 @@ function critState(c){
    rest timer
    ============================================================ */
 let rest = null, raf = 0;
+
+/* iOS will not play from an AudioContext created outside a user gesture, and
+   the beep fires minutes after your last tap. So unlock one context on the
+   first touch and keep it for the session. */
+let actx = null;
+function unlockAudio(){
+  try{
+    const C = window.AudioContext || window.webkitAudioContext;
+    if(!C) return;
+    if(!actx){
+      actx = new C();
+      const src = actx.createBufferSource();
+      src.buffer = actx.createBuffer(1, 1, 22050);
+      src.connect(actx.destination);
+      src.start(0);
+    }
+    if(actx.state === "suspended") actx.resume();
+  }catch(e){}
+}
+["pointerdown","keydown"].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, {passive:true}));
+
+/* Keep the screen awake while resting, or the timer's rAF loop stops and
+   you get no alert at all. */
+let wake = null;
+async function wakeOn(){
+  try{
+    if("wakeLock" in navigator && !wake){
+      wake = await navigator.wakeLock.request("screen");
+      wake.addEventListener("release", ()=>{ wake = null; });
+    }
+  }catch(e){}
+}
+function wakeOff(){
+  try{ if(wake){ wake.release(); wake = null; } }catch(e){}
+}
+
 function startRest(sec, label){
+  if(rest) clearTimeout(rest.alarm);
   rest = { end: Date.now()+sec*1000, total: sec, label };
+  /* Backstop: rAF is paused while backgrounded, a timeout usually isn't. */
+  rest.alarm = setTimeout(done, sec*1000 + 60);
   $("#restbar").classList.add("on");
   $("#restL").textContent = label;
+  wakeOn();
+  cancelAnimationFrame(raf);
   tick();
 }
 function stopRest(){
-  rest = null; cancelAnimationFrame(raf);
+  if(rest) clearTimeout(rest.alarm);
+  rest = null;
+  cancelAnimationFrame(raf);
+  wakeOff();
   $("#restbar").classList.remove("on");
   $("#railFill").style.width = "0";
 }
@@ -439,44 +598,75 @@ function tick(){
   raf = requestAnimationFrame(tick);
 }
 function done(){
+  if(!rest) return;              // rAF and the backstop timeout can race
+  clearTimeout(rest.alarm);
+  rest = null;
+  cancelAnimationFrame(raf);
+  wakeOff();
   $("#restT").textContent = "0:00";
   $("#railFill").style.width = "0";
-  beep(); if(navigator.vibrate) navigator.vibrate([180,90,180]);
-  rest = null;
+  beep();
+  if(navigator.vibrate) navigator.vibrate([180,90,180]);
   setTimeout(()=>{ if(!rest) $("#restbar").classList.remove("on"); }, 2500);
 }
 function beep(){
   try{
-    const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
-    const ctx = new C(), t = ctx.currentTime;
+    unlockAudio();
+    if(!actx) return;
+    const t = actx.currentTime;
     [0,.22].forEach((off,i)=>{
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type="sine"; o.frequency.value = i? 660 : 880;
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type="sine"; o.frequency.value = i ? 660 : 880;
       g.gain.setValueAtTime(.0001, t+off);
       g.gain.exponentialRampToValueAtTime(.28, t+off+.02);
       g.gain.exponentialRampToValueAtTime(.0001, t+off+.18);
-      o.connect(g).connect(ctx.destination); o.start(t+off); o.stop(t+off+.2);
+      o.connect(g).connect(actx.destination);
+      o.start(t+off); o.stop(t+off+.2);
     });
-    setTimeout(()=>ctx.close(), 900);
   }catch(e){}
 }
+/* Coming back from a locked screen: resync the countdown and reclaim the lock. */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState !== "visible" || !rest) return;
+  wakeOn();
+  cancelAnimationFrame(raf);
+  tick();
+});
 $("#restSkip").onclick = stopRest;
 
 /* ============================================================
    TODAY
    ============================================================ */
+/* Draft entries are keyed by position in the exercise list, so a draft is only
+   valid while that list is unchanged. Editing program.json — or a deload week
+   halving the set counts — must invalidate it rather than silently shift your
+   numbers onto the wrong movement. */
+function fingerprint(sessionKey){
+  const s = phase().sessions[sessionKey];
+  if(!s) return null;
+  return s.exercises.map(ex => ex.id+":"+effSets(ex)).join("|");
+}
 function newDraft(sessionKey){
   const ph = phase();
-  const d = { phase: ph.id, sessionKey, date: today(), entries: {} };
+  const d = {
+    phase: ph.id, sessionKey, date: today(),
+    fp: fingerprint(sessionKey),
+    meta: { sleep:"", bw:"", note:"" },
+    entries: {}
+  };
   ph.sessions[sessionKey].exercises.forEach((ex,i)=>{
-    d.entries[i] = { id: ex.id, load: 0, sets: new Array(ex.sets).fill(null) };
+    d.entries[i] = { id: ex.id, load: 0, sets: new Array(effSets(ex)).fill(null) };
   });
   return d;
 }
 function loadDraft(){
   try{
     const d = JSON.parse(localStorage.getItem(DRAFT));
-    if(d && d.date===today() && d.phase===phase().id && phase().sessions[d.sessionKey]) return d;
+    if(!d || d.date!==today() || d.phase!==phase().id) return null;
+    if(!phase().sessions[d.sessionKey]) return null;
+    if(d.fp !== fingerprint(d.sessionKey)) return null;
+    if(!d.meta) d.meta = { sleep:"", bw:"", note:"" };
+    return d;
   }catch(e){}
   return null;
 }
@@ -501,9 +691,54 @@ function pickSession(k){
   renderSeg(); renderToday();
 }
 
+function banner(kind, key, title, msg, actions){
+  const b = el("div","banner "+kind);
+  b.appendChild(el("span","b-k", key));
+  const m = el("div","b-m");
+  m.appendChild(el("b",null,title));
+  m.appendChild(document.createTextNode(msg));
+  b.appendChild(m);
+  if(actions && actions.length){
+    const a = el("div","acts");
+    actions.forEach(([label,fn])=>{ const x = el("button",null,label); x.onclick = fn; a.appendChild(x); });
+    b.appendChild(a);
+  }
+  return b;
+}
+
 function renderToday(){
   const body = $("#todayBody"); body.innerHTML="";
   const ph = phase(), sess = ph.sessions[pickedSession];
+
+  if(inDeloadWeek()){
+    body.appendChild(banner("info","Deload","Deload week",
+      "Half the sets, same reps — the set counts below are already halved. Keep skill practice. You'll come back stronger.",
+      [["End early", ()=>{
+        if(!confirm("End the deload week now and go back to full sets?")) return;
+        S.settings.deloads = S.settings.deloads.filter(d=>d!==lastDeload()); save();
+        draft = newDraft(pickedSession); saveDraft(); renderAll();
+      }]]));
+  }else{
+    const due = deloadDue();
+    if(due){
+      const why = due.why==="regression"
+        ? due.list.slice(0,2).map(r=>r.ex.name.toLowerCase()).join(" and ")+" have gone backwards three sessions running."
+        : "You've trained "+due.weeks+" weeks straight.";
+      body.appendChild(banner("warn","Deload", due.why==="overdue" ? "Deload overdue" : "Deload due",
+        why+" Take one week at half the sets, same reps.",
+        [["Start", ()=>{
+          S.settings.deloads = (S.settings.deloads||[]).concat(today()); save();
+          draft = newDraft(pickedSession); saveDraft(); renderAll(); toast("Deload week started");
+        }]]));
+    }
+  }
+
+  if(needsBackup()){
+    body.appendChild(banner("warn","Backup", unbackedUp()+" sessions not backed up",
+      "This data lives only in this browser. Clearing site data erases it.",
+      [["Export", ()=>{ exportJSON(); renderToday(); }],
+       ["Later", ()=>{ ackBackup(); renderToday(); }]]));
+  }
 
   const warm = el("details","warm");
   const sum = el("summary"); sum.appendChild(el("span",null,"Warm-up · 7 min"));
@@ -516,6 +751,8 @@ function renderToday(){
   const h = el("h2", null, sess.name); body.appendChild(h);
 
   sess.exercises.forEach((ex,i)=>body.appendChild(exCard(ex,i)));
+
+  body.appendChild(metaCard());
 
   const btn = el("button","btn","Save session");
   btn.id = "saveBtn";
@@ -531,6 +768,43 @@ function renderToday(){
   syncSave();
 }
 
+/* Sleep, bodyweight and notes — the rest of the log template in section 10.
+   Sleep is called out in section 8 as more impactful than exercise selection,
+   so it belongs next to the sets, not buried in a settings screen. */
+function metaCard(){
+  const c = el("div","meta");
+  const row = el("div","row");
+
+  const mk = (key, label, ph, mode) => {
+    const cel = el("div","cel");
+    const l = el("label", null, label); l.htmlFor = "meta-"+key;
+    const i = document.createElement("input");
+    i.id = "meta-"+key; i.type = "text"; i.inputMode = mode; i.placeholder = ph;
+    i.value = draft.meta[key] || "";
+    i.oninput = ()=>{
+      const v = i.value.replace(/[^0-9.]/g,"");
+      if(i.value!==v) i.value = v;
+      draft.meta[key] = v; saveDraft();
+    };
+    cel.append(l, i);
+    return cel;
+  };
+  row.appendChild(mk("sleep","Sleep (h)","7.5","decimal"));
+
+  const lastW = S.weights.slice().sort((a,b)=>a.date<b.date?1:-1)[0];
+  row.appendChild(mk("bw","Bodyweight (kg)", lastW ? String(lastW.kg) : "66", "decimal"));
+  c.appendChild(row);
+
+  const l = el("label", null, "Notes"); l.htmlFor = "meta-note";
+  const t = document.createElement("textarea");
+  t.id = "meta-note";
+  t.placeholder = "How it felt, what the park was like, anything you'd want to read next week.";
+  t.value = draft.meta.note || "";
+  t.oninput = ()=>{ draft.meta.note = t.value; saveDraft(); };
+  c.append(l, t);
+  return c;
+}
+
 function exCard(ex, i){
   const card = el("div","ex");
   const ready = readyToProgress(pickedSession, ex);
@@ -541,7 +815,7 @@ function exCard(ex, i){
   const nm = el("span","ex-name"); nm.textContent = ex.name+" ";
   if(ex.skill) nm.appendChild(el("span","ex-skill","Skill"));
   hd.appendChild(nm);
-  hd.appendChild(el("span","ex-target", targetStr(ex)));
+  hd.appendChild(el("span","ex-target", targetStr(ex, effSets(ex))));
   card.appendChild(hd);
 
   const h = history(pickedSession, ex.id);
@@ -560,7 +834,7 @@ function exCard(ex, i){
 
   const entry = draft.entries[i];
   const track = el("div","track");
-  for(let s=0;s<ex.sets;s++){
+  for(let s=0;s<entry.sets.length;s++){
     const cell = el("label","cell");
     const fill = el("div","fill");
     const inp = document.createElement("input");
@@ -653,7 +927,19 @@ function saveSession(){
   });
   if(!Object.keys(entries).length) return;
 
-  const rec = { id: Date.now(), date: draft.date, phase: ph.id, sessionKey: pickedSession, entries };
+  const rec = {
+    id: Date.now(), date: draft.date, phase: ph.id, sessionKey: pickedSession, entries,
+    deload: inDeloadWeek() || undefined,
+    sleep: parseFloat(draft.meta.sleep) || undefined,
+    note: (draft.meta.note||"").trim() || undefined
+  };
+
+  /* Weighing in on the session screen beats a separate trip to the Data tab. */
+  const bw = parseFloat(draft.meta.bw);
+  if(bw >= 30 && bw <= 200){
+    S.weights = S.weights.filter(w=>w.date!==rec.date).concat({ date: rec.date, kg: bw });
+  }
+
   const dup = S.sessions.findIndex(s=>s.date===rec.date && s.sessionKey===rec.sessionKey);
   if(dup >= 0){
     if(!confirm("You already saved a "+P.sessionNames[pickedSession]+" today. Replace it?")) return;
@@ -728,6 +1014,50 @@ function renderProgress(){
   }
   v.appendChild(sec1);
 
+  /* --- deload --- */
+  const inW = inDeloadWeek(), due = deloadDue(), regs = regressions();
+  const secD = el("section");
+  secD.appendChild(el("h2",null,"Deload"));
+  const dl = el("div","gate"+(inW?" clear":""));
+  const dhdr = el("div","hdr");
+  dhdr.appendChild(el("span","name", inW ? "Deload week" : due ? "Due now" : "Training block"));
+  dhdr.appendChild(el("span","cnt", inW
+    ? Math.max(0, 7 - daysBetween(lastDeload(), today()))+" days left"
+    : weeksSinceDeload()+" weeks"));
+  dl.appendChild(dhdr);
+
+  if(inW){
+    dl.appendChild(el("p","ex-note","Half the sets, same reps — Today already shows the reduced counts. Keep skill practice. This is a feature, not lost time."));
+  }else{
+    dl.appendChild(el("p","ex-note", due
+      ? (due.why==="regression"
+          ? "Your numbers are going backwards. That's the signal to deload, not the calendar."
+          : "Six to eight weeks is the window, and you're at "+due.weeks+".")
+      : "Take one every 6–8 weeks, or as soon as your numbers go backwards two sessions running."));
+    if(regs.length){
+      const rows = el("div","rows");
+      rows.style.marginTop = "11px";
+      regs.forEach(r=>{
+        const row = el("div","r");
+        row.appendChild(el("span","d", P.sessionNames[r.k]));
+        row.appendChild(el("div","m", r.ex.name));
+        row.appendChild(el("span","x","going backwards"));
+        rows.appendChild(row);
+      });
+      dl.appendChild(rows);
+    }
+    const b = el("button","btn"+(due?"":" ghost"),"Start a deload week");
+    b.style.marginTop = "12px";
+    b.onclick = ()=>{
+      S.settings.deloads = (S.settings.deloads||[]).concat(today()); save();
+      draft = newDraft(pickedSession); saveDraft();
+      renderAll(); toast("Deload week started");
+    };
+    dl.appendChild(b);
+  }
+  secD.appendChild(dl);
+  v.appendChild(secD);
+
   /* --- ready to progress --- */
   const flags = [];
   sessionsOf(phase()).forEach(k=>{
@@ -772,7 +1102,14 @@ function renderProgress(){
     }
     sec3.appendChild(chart("Bodyweight", w.map(x=>x.kg), lastW.kg.toFixed(1), "kg", verdict));
   }else{
-    sec3.appendChild(el("div","empty","Weigh yourself weekly. The scale is how you know whether the food is working — add entries under Data."));
+    sec3.appendChild(el("div","empty","Weigh yourself weekly. The scale is how you know whether the food is working — log it with your session, or under Data."));
+  }
+  const slept = S.sessions.filter(s=>s.sleep).sort((a,b)=>a.date<b.date?1:-1).slice(0,7);
+  if(slept.length){
+    const avg = slept.reduce((a,s)=>a+s.sleep,0)/slept.length;
+    sec3.appendChild(el("p","hint",
+      "Sleep, last "+slept.length+" session"+(slept.length>1?"s":"")+": "+avg.toFixed(1)+" h average"+
+      (avg < 7 ? " — under the 7–9 h the program asks for, and it costs you more than any exercise choice." : ".")));
   }
   v.appendChild(sec3);
 
@@ -803,10 +1140,12 @@ function renderProgress(){
       const r = el("div","r");
       r.appendChild(el("span","d", short(s.date)));
       const m = el("div","m");
-      m.appendChild(el("div",null, P.sessionNames[s.sessionKey]));
+      m.appendChild(el("div",null, P.sessionNames[s.sessionKey] + (s.deload ? " · deload" : "")));
       const top = Object.values(s.entries).slice(0,3)
         .map(e=>e.name.split(",")[0]+" "+e.sets.join("/")).join(" · ");
       m.appendChild(el("div","ex-note", top));
+      if(s.sleep) m.appendChild(el("div","ex-note", s.sleep+" h sleep"));
+      if(s.note) m.appendChild(el("div","ex-note", "“"+s.note+"”"));
       r.appendChild(m);
       const del = el("button","del","Delete");
       del.setAttribute("aria-label","Delete session from "+s.date);
@@ -987,23 +1326,41 @@ function renderData(){
   s2.appendChild(el("p","hint","Set this by hand only if you need to go back. The app offers to advance you when you clear a gate."));
   v.appendChild(s2);
 
+  /* deload weeks */
+  const sD = el("section");
+  sD.appendChild(el("h2",null,"Deload weeks"));
+  const dls = (S.settings.deloads||[]).slice().sort((a,b)=>a<b?1:-1);
+  if(dls.length){
+    const rows = el("div","rows");
+    dls.forEach(d=>{
+      const r = el("div","r");
+      r.appendChild(el("span","d", short(d)));
+      r.appendChild(el("div","m", daysBetween(d, today()) < 7 ? "In progress" : "Week of "+d));
+      const del = el("button","del","Delete");
+      del.onclick = ()=>{
+        S.settings.deloads = S.settings.deloads.filter(x=>x!==d); save();
+        draft = newDraft(pickedSession); saveDraft(); renderAll();
+      };
+      r.appendChild(del);
+      rows.appendChild(r);
+    });
+    sD.appendChild(rows);
+  }else{
+    sD.appendChild(el("p","hint","None yet. Start one from Progress when you're due, or when your numbers go backwards twice."));
+  }
+  v.appendChild(sD);
+
   /* backup */
   const s3 = el("section");
   s3.appendChild(el("h2",null,"Backup"));
   const stat = el("p","hint");
-  stat.textContent = S.sessions.length+" sessions · "+S.weights.length+" weigh-ins · stored in this browser only";
+  stat.textContent = S.sessions.length+" sessions · "+S.weights.length+" weigh-ins · "
+    + (unbackedUp() > 0 ? unbackedUp()+" not yet exported · " : "")
+    + (persisted ? "storage marked persistent" : "stored in this browser only");
   s3.appendChild(stat);
 
   const ex = el("button","btn ghost","Export JSON");
-  ex.onclick = ()=>{
-    const blob = new Blob([JSON.stringify(S,null,2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "barlog-"+today()+".json";
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
-    toast("Exported");
-  };
+  ex.onclick = ()=>{ exportJSON(); renderData(); };
   s3.appendChild(ex);
 
   const imp = el("button","btn ghost","Import JSON");
@@ -1112,6 +1469,16 @@ fetch("program.json", {cache:"no-cache"})
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+/* Ask the browser not to evict this origin under storage pressure. Granted
+   without a prompt for installed PWAs on most platforms; a no-op elsewhere.
+   The export nudge is the real backstop. */
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persisted()
+    .then(p => p || navigator.storage.persist())
+    .then(p => { persisted = !!p; })
+    .catch(()=>{});
 }
 </script>
 </body>
