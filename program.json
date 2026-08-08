@@ -80,9 +80,9 @@
           "name": "Lower + Core",
           "exercises": [
             { "id": "tuckLsit", "name": "Tuck L-sit", "sets": 5, "type": "hold", "min": 10, "max": 15, "rest": 60, "skill": true, "note": "On dip bars or the floor." },
-            { "id": "bulgarian", "name": "Bulgarian split squat", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 120, "perSide": true, "loadable": true, "note": "Load the backpack once you pass 12." },
+            { "id": "bulgarian", "name": "Bulgarian split squat", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.85, "note": "Load the backpack once you pass 12." },
             { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 5, "rest": 120, "note": "Or single-leg RDL 3×10/leg if you can't anchor your feet." },
-            { "id": "stepUps", "name": "Step-ups", "sets": 3, "type": "reps", "min": 10, "max": 12, "rest": 90, "perSide": true, "loadable": true, "note": "Knee height. Slow, no pushing off the back foot." },
+            { "id": "stepUps", "name": "Step-ups", "sets": 3, "type": "reps", "min": 10, "max": 12, "rest": 90, "perSide": true, "loadable": true, "bwFactor": 0.5, "note": "Knee height. Slow, no pushing off the back foot." },
             { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true, "note": "Full stretch at the bottom." },
             { "id": "kneeRaises", "name": "Hanging knee raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "note": "No swinging." },
             { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 20, "max": 30, "rest": 60, "note": "Lower back stays pressed down." }
@@ -94,7 +94,7 @@
             { "id": "wallHandstand", "name": "Wall handstand + shoulder taps", "sets": 4, "type": "hold", "min": 20, "max": 30, "rest": 60, "skill": true, "note": "Add the taps once the hold is solid." },
             { "id": "dips", "name": "Dips", "sets": 5, "type": "reps", "min": 5, "max": 5, "rest": 180, "loadable": true, "note": "Heavier day." },
             { "id": "chinups", "name": "Chin-ups", "sets": 4, "type": "reps", "min": 3, "max": 3, "rest": 150, "loadable": true, "note": "Underhand. Easier than pull-ups — that's the point." },
-            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true, "note": "2 seconds down, 1 up." },
+            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true, "bwFactor": 0.7, "note": "2 seconds down, 1 up." },
             { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
             { "id": "diamondPushups", "name": "Diamond push-ups", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "note": "Triceps." },
             { "id": "pullupNegatives", "name": "Pull-up negatives", "sets": 3, "type": "reps", "min": 3, "max": 3, "rest": 90, "note": "Jump up, lower over 5 s. Finisher." }
@@ -132,7 +132,7 @@
           "name": "Lower + Core",
           "exercises": [
             { "id": "tuckLsitAdv", "name": "Advanced tuck L-sit", "sets": 5, "type": "hold", "min": 10, "max": 15, "rest": 60, "skill": true, "note": "Hips open more than a plain tuck." },
-            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 120, "perSide": true, "loadable": true },
+            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.85 },
             { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 6, "rest": 120 },
             { "id": "pistolAssisted", "name": "Assisted pistol squat", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 120, "perSide": true, "note": "Box squat, to a lower and lower surface." },
             { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true },
@@ -146,7 +146,7 @@
             { "id": "handstandNegatives", "name": "Wall handstand negatives", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 90, "skill": true, "note": "Walk in close, lower slowly to your head, press back up." },
             { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 180, "loadable": true, "note": "Heavier day — load this one first." },
             { "id": "chinups", "name": "Chin-ups", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 150, "loadable": true },
-            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true },
+            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true, "bwFactor": 0.7 },
             { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
             { "id": "archerPushups", "name": "Archer push-ups", "sets": 3, "type": "reps", "min": 6, "max": 8, "rest": 90, "perSide": true },
             { "id": "pullupNegatives", "name": "Pull-up negatives", "sets": 3, "type": "reps", "min": 3, "max": 4, "rest": 90, "note": "Lower over 5 s. Finisher." }
@@ -184,7 +184,7 @@
           "name": "Lower + Core",
           "exercises": [
             { "id": "fullLsit", "name": "L-sit, one leg straight", "sets": 5, "type": "hold", "min": 8, "max": 15, "rest": 60, "skill": true, "note": "One leg straight, then both." },
-            { "id": "pistolSquats", "name": "Pistol squats", "sets": 4, "type": "reps", "min": 5, "max": 8, "rest": 120, "perSide": true, "loadable": true },
+            { "id": "pistolSquats", "name": "Pistol squats", "sets": 4, "type": "reps", "min": 5, "max": 8, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.9 },
             { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 120, "perSide": true, "loadable": true },
             { "id": "nordics", "name": "Nordic curls", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 120 },
             { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true, "loadable": true },

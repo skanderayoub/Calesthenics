@@ -151,6 +151,11 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
   padding:0;outline-offset:-2px;
 }
 .cell input::placeholder{color:var(--dim);font-weight:400;font-size:15px}
+/* A dashed box holds last session's number, waiting for one tap. */
+.cell.sugg{border-style:dashed}
+.cell.sugg input::placeholder{color:var(--muted);font-size:18px;font-weight:600}
+.cell .accept{position:absolute;inset:0;z-index:2;background:none;border:0;padding:0}
+.cell .accept:active{background:rgba(63,201,174,.12)}
 .cell.full{border-color:var(--go)}
 .cell.full .fill{opacity:.3}
 .cell.full input{color:var(--go)}
@@ -403,7 +408,7 @@ const blank = {
   version: 1,
   sessions: [],
   weights: [],
-  settings: { phase: "phase1", deloads: [], backupAck: 0 }
+  settings: { phase: "phase1", deloads: [], backupAck: 0, tipSeen: false }
 };
 
 function load(){
@@ -551,6 +556,42 @@ function readyToProgress(sessionKey, ex){
   if(h[0].load !== h[1].load) return false;
   return h.every(s => s.sets.length >= ex.sets && s.sets.every(v => v!=null && v >= ex.max));
 }
+
+/* ============================================================
+   load-normalised progress
+   ============================================================ */
+/* Raw rep counts stop being comparable the moment the backpack goes on, and
+   Phase 2 tells you to put it on. Six bodyweight pull-ups becoming four at
+   +10 kg is progress, but a rep chart draws it as a cliff. Epley e1RM over
+   (bodyweight × leverage + added) keeps the curve honest. */
+function findEx(exId){
+  const order = [phase()].concat(P.phases.filter(p=>p.id!==phase().id));
+  for(const ph of order)
+    for(const k of sessionsOf(ph)){
+      const e = ph.sessions[k].exercises.find(x=>x.id===exId);
+      if(e) return e;
+    }
+  return null;
+}
+/* Bodyweight as of a given date — you weigh more in week 12 than week 1, and
+   that extra mass is load you're moving. */
+function bodyweightAt(date){
+  const w = S.weights
+    .filter(x => !date || x.date <= date)
+    .sort((a,b)=> a.date<b.date?1:-1)[0];
+  return w ? w.kg : ((P.athlete && P.athlete.startWeightKg) || 70);
+}
+function scorable(ex){ return !!ex && ex.type==="reps" && !!ex.loadable; }
+function setScore(ex, reps, added, date){
+  const bw = bodyweightAt(date) * (ex.bwFactor!=null ? ex.bwFactor : 1);
+  return (bw + (added||0)) * (1 + reps/30);
+}
+/* Only switch the chart's metric once load is actually in play. Before that,
+   reps are perfectly comparable and the plain number is easier to read. */
+function everLoaded(exId){
+  return S.sessions.some(s => s.entries[exId] && (s.entries[exId].load||0) > 0);
+}
+const topSet = sets => Math.max(...sets.filter(v=>v!=null).concat([0]));
 
 /* Best single set for a movement across the whole log, optionally at a load. */
 function best(exId, opts){
@@ -713,7 +754,15 @@ function newDraft(sessionKey){
     entries: {}
   };
   ph.sessions[sessionKey].exercises.forEach((ex,i)=>{
-    d.entries[i] = { id: ex.id, load: 0, sets: new Array(effSets(ex)).fill(null) };
+    /* Carry the backpack forward. Leaving it at 0 when you trained at +10 kg
+       last week records a load you didn't use and wrecks the comparison the
+       progression rule depends on. */
+    const h = ex.loadable ? history(sessionKey, ex.id) : null;
+    d.entries[i] = {
+      id: ex.id,
+      load: h && h.length ? h[0].load : 0,
+      sets: new Array(effSets(ex)).fill(null)
+    };
   });
   return d;
 }
@@ -855,6 +904,12 @@ function renderToday(){
     }
   }
 
+  if(!editing() && !S.settings.tipSeen && S.sessions.length >= 1){
+    body.appendChild(banner("info","Tip","One tap logs last time's number",
+      "Dashed boxes show what you did in that set last session. Tap one to log it as-is, or type over it when the number differs.",
+      [["Got it", ()=>{ S.settings.tipSeen = true; save(); renderToday(); }]]));
+  }
+
   if(!editing() && needsBackup()){
     body.appendChild(banner("warn","Backup", unbackedUp()+" sessions not backed up",
       "This data lives only in this browser. Clearing site data erases it.",
@@ -967,14 +1022,28 @@ function exCard(ex, i){
   card.appendChild(last);
 
   const track = el("div","track");
+  const suggest = h.length ? h[0].sets : null;   // what you did last time
   for(let s=0;s<entry.sets.length;s++){
-    const cell = el("label","cell");
+    const ghost = suggest && suggest[s]!=null ? suggest[s] : null;
+    const cell = el("div","cell");
     const fill = el("div","fill");
     const inp = document.createElement("input");
     inp.type="text"; inp.inputMode="numeric"; inp.pattern="[0-9]*";
-    inp.placeholder = ex.type==="hold" ? "s" : "–";
+    inp.placeholder = ghost!=null ? String(ghost) : (ex.type==="hold" ? "s" : "–");
     inp.setAttribute("aria-label", ex.name+" set "+(s+1));
     inp.value = entry.sets[s]==null ? "" : entry.sets[s];
+
+    const logSet = v => {
+      entry.sets[s] = v;
+      inp.value = v;
+      cell.classList.remove("sugg");
+      const a = cell.querySelector(".accept");
+      if(a) a.remove();
+      paint(cell, v, ex);
+      saveDraft(); syncSave();
+      if(ex.rest) startRest(ex.rest, ex.name+" · set "+(s+1)+" logged");
+    };
+
     inp.oninput = ()=>{
       const v = inp.value.replace(/[^0-9]/g,"").slice(0,3);
       if(inp.value!==v) inp.value=v;
@@ -985,13 +1054,24 @@ function exCard(ex, i){
     /* Rest starts when you leave a set you just changed — not when you tab
        back over one you already filled. */
     let held = null;
-    inp.onfocus = ()=>{ held = entry.sets[s]; };
+    inp.onfocus = ()=>{ held = entry.sets[s]; inp.select(); };
     inp.onblur = ()=>{
       if(entry.sets[s]!=null && entry.sets[s]!==held && ex.rest)
         startRest(ex.rest, ex.name+" · set "+(s+1)+" logged");
       held = null;
     };
     cell.append(fill, inp);
+
+    /* Most sets match last session, so the common case is one tap on the
+       dashed box. The keyboard is for when it differs — tap again to edit. */
+    if(entry.sets[s]==null && ghost!=null){
+      cell.classList.add("sugg");
+      const acc = el("button","accept");
+      acc.type = "button";
+      acc.setAttribute("aria-label", "Log "+ghost+" for "+ex.name+" set "+(s+1));
+      acc.onclick = ()=>logSet(ghost);
+      cell.appendChild(acc);
+    }
     paint(cell, entry.sets[s], ex);
     track.appendChild(cell);
   }
@@ -1075,9 +1155,10 @@ function syncSave(){
   const b = $("#saveBtn"); if(!b) return;
   const n = Object.values(draft.entries).reduce((a,e)=>a+e.sets.filter(v=>v!=null).length,0);
   b.disabled = n===0;
+  const sets = n+" set"+(n===1?"":"s");
   b.textContent = n===0
     ? (editing() ? "Clear every set to delete this session" : "Log a set to save")
-    : (editing() ? "Save changes · "+n+" sets" : "Save session · "+n+" sets");
+    : (editing() ? "Save changes · "+sets : "Save session · "+sets);
 }
 
 function saveSession(){
@@ -1168,17 +1249,25 @@ function openHistory(ex){
   hd.appendChild(x);
   inner.appendChild(hd);
 
+  const scored = scorable(ex) && everLoaded(ex.id);
+  const score = r => Math.round(setScore(ex, top(r), r.load, r.date));
+
   const stats = el("div","stat-row");
   const stat = (k,v)=>{ const d=el("div","stat"); d.appendChild(el("div","sv",v)); d.appendChild(el("div","sk",k)); return d; };
   stats.appendChild(stat("Best set", h.length ? Math.max(...h.map(top))+unit : "–"));
-  stats.appendChild(stat("Sessions", String(h.length)));
+  stats.appendChild(scored
+    ? stat("Best e1RM", Math.max(...h.map(score))+" kg")
+    : stat("Sessions", String(h.length)));
   stats.appendChild(stat("Last", h.length ? short(h[0].date) : "–"));
   inner.appendChild(stats);
 
   if(h.length >= 2){
-    const pts = h.slice().reverse().map(top);
-    inner.appendChild(chart("Top set", pts, pts[pts.length-1]+unit,
-      ex.type==="hold" ? "now" : "reps", "Every session, oldest first"));
+    const pts = h.slice().reverse().map(r => scored ? score(r) : top(r));
+    inner.appendChild(chart("Top set", pts, pts[pts.length-1] + (scored ? "" : unit),
+      scored ? "kg e1RM" : (ex.type==="hold" ? "now" : "reps"),
+      scored
+        ? "Estimated 1RM on bodyweight + backpack, oldest first"
+        : "Every session, oldest first"));
   }
 
   if(h.length){
@@ -1363,14 +1452,19 @@ function renderProgress(){
   sec4.appendChild(el("h2",null,"Top set"));
   let any = false;
   [["pullups","Pull-ups"],["dips","Dips"]].forEach(([id,label])=>{
-    const pts = S.sessions
-      .filter(s=>s.entries[id])
-      .sort((a,b)=>a.date<b.date?-1:1)
-      .map(s=>Math.max(...s.entries[id].sets));
-    if(pts.length >= 2){
-      any = true;
-      sec4.appendChild(chart(label, pts, String(Math.max(...pts)), "best", pts.length+" sessions logged"));
-    }
+    const sess = S.sessions.filter(s=>s.entries[id]).sort((a,b)=>a.date<b.date?-1:1);
+    if(sess.length < 2) return;
+    const ex = findEx(id);
+    const scored = scorable(ex) && everLoaded(id);
+    const pts = sess.map(s => scored
+      ? Math.round(setScore(ex, topSet(s.entries[id].sets), s.entries[id].load, s.date))
+      : topSet(s.entries[id].sets));
+    any = true;
+    sec4.appendChild(chart(label, pts, String(pts[pts.length-1]),
+      scored ? "kg e1RM" : "best",
+      scored
+        ? "Estimated 1RM on bodyweight + backpack, so adding load reads as progress"
+        : sess.length+" sessions logged · best set"));
   });
   if(!any) sec4.appendChild(el("div","empty","Charts appear once you've logged pull-ups or dips twice."));
   v.appendChild(sec4);

@@ -6,7 +6,8 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 
 ## What it does that a notes app doesn't
 
-- **Shows last session's numbers** next to every set input, scoped to the session you're in (Upper A dips and Upper B dips are prescribed differently, so their histories are tracked separately).
+- **One tap logs a set.** Each box is pre-filled with what you did in that set last session, shown dashed. Tap to log it as-is; tap again to type something different. Backpack load carries forward too. Scoped per session — Upper A dips and Upper B dips are prescribed differently, so their histories stay separate.
+- **Charts don't lie when you add weight.** Once an exercise has been logged with load, its chart switches from raw reps to estimated 1RM over bodyweight + backpack. Six bodyweight pull-ups becoming four at +10 kg is a rise from 79 to 86 kg, not the cliff a rep count would draw.
 - **Applies the double-progression rule.** When you hit the top of a rep range on every set, at the same load, two sessions in a row, the exercise turns amber and tells you to add weight or move to the harder variation.
 - **Calls the deload.** Flags when two or more movements have gone backwards three sessions running, or when you've trained 6–8 weeks straight. Starting a deload week halves every set count on the Today screen, same reps, as section 7 asks.
 - **Times your rests.** Logging a set starts the prescribed countdown, with a drain bar you can read from arm's length off the bar. Holds a screen wake lock while resting, so the alarm still fires.
@@ -63,7 +64,8 @@ Edit `program.json`. Each exercise takes:
   "type": "reps",         // or "hold" (min/max are then seconds)
   "min": 2, "max": 3,     // the rep range the progression rule watches
   "rest": 180,            // seconds
-  "loadable": true,       // shows a +kg field
+  "loadable": true,       // shows a +kg field, and enables e1RM charting
+  "bwFactor": 1,          // share of bodyweight the movement carries; default 1
   "perSide": false,
   "skill": true,          // adds the Skill tag
   "note": "…"
