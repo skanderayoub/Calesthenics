@@ -1,7 +1,7 @@
 /* Bar Log offline shell.
    index.html and program.json use network-first so edits to the program show up
    on the next load with signal; everything falls back to cache at the park. */
-const CACHE = "barlog-v2";
+const CACHE = "barlog-v3";
 const ASSETS = ["./", "./index.html", "./program.json", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {

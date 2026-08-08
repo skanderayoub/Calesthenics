@@ -94,6 +94,7 @@ h2{
   font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
 }
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.seg button:disabled{opacity:.35}
 
 /* ---------- warmup ---------- */
 details.warm{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);margin-bottom:18px}
@@ -117,11 +118,16 @@ details.warm li{margin:6px 0}
 .ex.ready{border-top-color:var(--up)}
 .ex-hd{display:flex;align-items:baseline;gap:9px}
 .ex-n{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:700;min-width:14px}
-.ex-name{font-weight:600;font-size:15.5px;flex:1;line-height:1.25}
+button.ex-name{
+  flex:1;min-width:0;text-align:left;padding:0;font-weight:600;font-size:15.5px;
+  line-height:1.25;color:var(--ink);align-self:flex-start;
+}
+button.ex-name .ex-label{border-bottom:1px dotted var(--dim);padding-bottom:1px}
+button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .ex-target{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .ex-skill{
   font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--bg);background:var(--dim);
-  padding:1px 5px;border-radius:2px;vertical-align:2px;
+  padding:1px 5px;border-radius:2px;vertical-align:2px;margin-left:7px;
 }
 .ex-last{
   font-family:var(--mono);font-size:11.5px;color:var(--dim);margin:7px 0 0;
@@ -158,6 +164,12 @@ details.warm li{margin:6px 0}
   width:52px;padding:5px 6px;background:var(--surface2);border:1px solid var(--line);border-radius:4px;
   font-family:var(--mono);font-size:13px;text-align:center;font-variant-numeric:tabular-nums;
 }
+.setctl{display:flex;gap:6px}
+.setctl button{
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line);border-radius:5px;padding:7px 9px;white-space:nowrap;
+}
+.setctl button:active{background:var(--surface2)}
 .rest-btn{
   margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
   color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:7px 11px;
@@ -299,6 +311,33 @@ nav button{
 }
 nav button .ic{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 nav button[aria-current=page]{color:var(--go)}
+
+/* ---------- per-exercise history sheet ---------- */
+.sheet{
+  position:fixed;inset:0;z-index:80;background:rgba(5,9,10,.74);
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.sheet-in{
+  width:100%;max-width:600px;max-height:88vh;overflow-y:auto;
+  background:var(--bg);border:1px solid var(--line);border-bottom:0;
+  border-radius:14px 14px 0 0;
+  padding:18px 16px calc(26px + env(safe-area-inset-bottom));
+  animation:sheetUp .22s ease;
+}
+@keyframes sheetUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+.sheet-hd{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.sheet-hd>div:first-child{flex:1;min-width:0}
+.sheet-t{font-size:19px;font-weight:600;line-height:1.22}
+.sheet-s{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:5px}
+.sheet-x{
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);
+  border:1px solid var(--line);border-radius:5px;padding:8px 12px;white-space:nowrap;
+}
+.stat-row{display:flex;gap:8px;margin-bottom:14px}
+.stat{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:7px;background:var(--surface);padding:11px 8px;text-align:center}
+.stat .sv{font-family:var(--mono);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .sk{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+.hs{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
 
 /* ---------- toast ---------- */
 #toast{
@@ -491,7 +530,17 @@ function history(sessionKey, exId){
   return S.sessions
     .filter(s => s.sessionKey===sessionKey && s.entries[exId] && s.entries[exId].sets.length)
     .sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0)
-    .map(s => ({ date:s.date, load:s.entries[exId].load||0, sets:s.entries[exId].sets }));
+    .map(s => ({ id:s.id, date:s.date, load:s.entries[exId].load||0, sets:s.entries[exId].sets }));
+}
+
+/* Every session containing a movement, across both Upper days and all phases —
+   the trajectory question, as opposed to the progression rule's per-session one. */
+function allHistory(exId){
+  return S.sessions
+    .filter(s => s.entries[exId] && s.entries[exId].sets.length)
+    .sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0)
+    .map(s => ({ id:s.id, date:s.date, key:s.sessionKey, deload:!!s.deload,
+                 load:s.entries[exId].load||0, sets:s.entries[exId].sets }));
 }
 
 /* Fires when every set hit the top of the range, at the same load,
@@ -641,16 +690,25 @@ $("#restSkip").onclick = stopRest;
    valid while that list is unchanged. Editing program.json — or a deload week
    halving the set counts — must invalidate it rather than silently shift your
    numbers onto the wrong movement. */
-function fingerprint(sessionKey){
-  const s = phase().sessions[sessionKey];
-  if(!s) return null;
-  return s.exercises.map(ex => ex.id+":"+effSets(ex)).join("|");
+function fpIds(phaseId, sessionKey){
+  const s = phase(phaseId).sessions[sessionKey];
+  return s ? s.exercises.map(ex => ex.id).join("|") : null;
 }
+function fpSets(phaseId, sessionKey){
+  const s = phase(phaseId).sessions[sessionKey];
+  return s ? s.exercises.map(ex => effSets(ex)).join("|") : null;
+}
+/* The phase the open draft belongs to — not necessarily the current one, since
+   you can reopen a session from an earlier phase to correct it. */
+function draftPhase(){ return phase(draft && draft.phase); }
+function editing(){ return !!(draft && draft.editId); }
+
 function newDraft(sessionKey){
   const ph = phase();
   const d = {
     phase: ph.id, sessionKey, date: today(),
-    fp: fingerprint(sessionKey),
+    fpIds: fpIds(ph.id, sessionKey),
+    fpSets: fpSets(ph.id, sessionKey),
     meta: { sleep:"", bw:"", note:"" },
     entries: {}
   };
@@ -659,24 +717,83 @@ function newDraft(sessionKey){
   });
   return d;
 }
+
+/* Reopen a saved session for correction. Set counts come from what was
+   actually logged, not from today's prescription. */
+function draftFromSession(rec){
+  const ph = phase(rec.phase);
+  const sess = ph.sessions[rec.sessionKey];
+  if(!sess) return null;
+  const w = S.weights.find(x => x.date===rec.date);
+  const d = {
+    phase: ph.id, sessionKey: rec.sessionKey, date: rec.date, editId: rec.id,
+    fpIds: fpIds(ph.id, rec.sessionKey),
+    fpSets: null,
+    meta: {
+      sleep: rec.sleep!=null ? String(rec.sleep) : "",
+      bw: w ? String(w.kg) : "",
+      note: rec.note || ""
+    },
+    entries: {}
+  };
+  sess.exercises.forEach((ex,i)=>{
+    const e = rec.entries[ex.id];
+    d.entries[i] = e
+      ? { id: ex.id, load: e.load||0, sets: e.sets.slice() }
+      : { id: ex.id, load: 0, sets: new Array(ex.sets).fill(null) };
+  });
+  return d;
+}
+
 function loadDraft(){
   try{
     const d = JSON.parse(localStorage.getItem(DRAFT));
-    if(!d || d.date!==today() || d.phase!==phase().id) return null;
-    if(!phase().sessions[d.sessionKey]) return null;
-    if(d.fp !== fingerprint(d.sessionKey)) return null;
+    if(!d || !d.phase || phase(d.phase).id !== d.phase) return null;
+    if(!phase(d.phase).sessions[d.sessionKey]) return null;
+    if(d.fpIds !== fpIds(d.phase, d.sessionKey)) return null;
+    /* An unfinished edit outlives the day. A fresh draft doesn't, and it also
+       has to still match today's set counts. */
+    if(!d.editId){
+      if(d.date !== today() || d.phase !== phase().id) return null;
+      if(d.fpSets !== fpSets(d.phase, d.sessionKey)) return null;
+    }
     if(!d.meta) d.meta = { sleep:"", bw:"", note:"" };
     return d;
   }catch(e){}
   return null;
 }
+
+function editSession(rec){
+  const d = draftFromSession(rec);
+  if(!d){ toast("That session isn't in the program any more"); return; }
+  const dirty = draft && !editing() && Object.values(draft.entries).some(e=>e.sets.some(v=>v!=null));
+  if(dirty && !confirm("You have unsaved sets for today. Open the older session anyway?")) return;
+  draft = d;
+  pickedSession = rec.sessionKey;
+  saveDraft();
+  renderSeg(); renderToday();
+  go("today");
+}
+function exitEdit(){
+  const sug = suggested();
+  pickedSession = phase().sessions[sug] ? sug : sessionsOf(phase())[0];
+  draft = newDraft(pickedSession);
+  saveDraft();
+  renderSeg(); renderToday();
+}
+function cancelEdit(){
+  if(!confirm("Discard your changes to this session?")) return;
+  exitEdit();
+  go("progress");
+}
 const saveDraft = () => localStorage.setItem(DRAFT, JSON.stringify(draft));
 
 function renderSeg(){
   const seg = $("#seg"); seg.innerHTML="";
-  sessionsOf(phase()).forEach(k=>{
+  sessionsOf(draftPhase()).forEach(k=>{
     const b = el("button", null, P.sessionNames[k]);
     b.setAttribute("aria-pressed", String(k===pickedSession));
+    b.disabled = editing();      // an edit is pinned to its own session
     b.onclick = ()=>{ pickSession(k); };
     seg.appendChild(b);
   });
@@ -708,9 +825,14 @@ function banner(kind, key, title, msg, actions){
 
 function renderToday(){
   const body = $("#todayBody"); body.innerHTML="";
-  const ph = phase(), sess = ph.sessions[pickedSession];
+  const ph = draftPhase(), sess = ph.sessions[pickedSession];
 
-  if(inDeloadWeek()){
+  if(editing()){
+    body.appendChild(banner("info","Editing",
+      P.sessionNames[pickedSession]+" · "+draft.date,
+      "Saving replaces that session and keeps its original date.",
+      [["Cancel", cancelEdit]]));
+  }else if(inDeloadWeek()){
     body.appendChild(banner("info","Deload","Deload week",
       "Half the sets, same reps — the set counts below are already halved. Keep skill practice. You'll come back stronger.",
       [["End early", ()=>{
@@ -733,7 +855,7 @@ function renderToday(){
     }
   }
 
-  if(needsBackup()){
+  if(!editing() && needsBackup()){
     body.appendChild(banner("warn","Backup", unbackedUp()+" sessions not backed up",
       "This data lives only in this browser. Clearing site data erases it.",
       [["Export", ()=>{ exportJSON(); renderToday(); }],
@@ -759,12 +881,18 @@ function renderToday(){
   btn.onclick = saveSession;
   body.appendChild(btn);
 
-  const clr = el("button","btn ghost","Clear today's entries");
-  clr.onclick = ()=>{
-    if(!confirm("Clear every number you've entered today?")) return;
-    draft = newDraft(pickedSession); saveDraft(); renderToday();
-  };
-  body.appendChild(clr);
+  if(editing()){
+    const cx = el("button","btn ghost","Cancel");
+    cx.onclick = cancelEdit;
+    body.appendChild(cx);
+  }else{
+    const clr = el("button","btn ghost","Clear today's entries");
+    clr.onclick = ()=>{
+      if(!confirm("Clear every number you've entered today?")) return;
+      draft = newDraft(pickedSession); saveDraft(); renderToday();
+    };
+    body.appendChild(clr);
+  }
   syncSave();
 }
 
@@ -807,18 +935,24 @@ function metaCard(){
 
 function exCard(ex, i){
   const card = el("div","ex");
+  const entry = draft.entries[i];
   const ready = readyToProgress(pickedSession, ex);
   if(ready) card.classList.add("ready");
 
   const hd = el("div","ex-hd");
   hd.appendChild(el("span","ex-n", String(i+1)));
-  const nm = el("span","ex-name"); nm.textContent = ex.name+" ";
+  const nm = el("button","ex-name");
+  nm.type = "button";
+  nm.appendChild(el("span","ex-label", ex.name));
   if(ex.skill) nm.appendChild(el("span","ex-skill","Skill"));
+  nm.setAttribute("aria-label", "History for "+ex.name);
+  nm.onclick = ()=>openHistory(ex);
   hd.appendChild(nm);
-  hd.appendChild(el("span","ex-target", targetStr(ex, effSets(ex))));
+  hd.appendChild(el("span","ex-target", targetStr(ex, entry.sets.length)));
   card.appendChild(hd);
 
-  const h = history(pickedSession, ex.id);
+  /* When editing, the session being corrected is not its own "last time". */
+  const h = history(pickedSession, ex.id).filter(r => r.id !== draft.editId);
   const last = el("div","ex-last");
   if(h.length){
     last.appendChild(el("b",null,"Last"));
@@ -832,7 +966,6 @@ function exCard(ex, i){
   }
   card.appendChild(last);
 
-  const entry = draft.entries[i];
   const track = el("div","track");
   for(let s=0;s<entry.sets.length;s++){
     const cell = el("label","cell");
@@ -880,6 +1013,26 @@ function exCard(ex, i){
     wrap.append(lab, li);
     foot.appendChild(wrap);
   }
+
+  /* Real sessions don't always match the prescription — an extra set when you
+     feel good, one fewer when the bar is taken. */
+  const ctl = el("div","setctl");
+  const add = el("button",null,"+ Set");
+  add.title = "Add a set";
+  add.onclick = ()=>{ entry.sets.push(null); saveDraft(); refreshCard(i); };
+  ctl.appendChild(add);
+  if(entry.sets.length > 1){
+    const rm = el("button",null,"− Set");
+    rm.title = "Remove the last set";
+    rm.onclick = ()=>{
+      const v = entry.sets[entry.sets.length-1];
+      if(v!=null && !confirm("Remove the last set? It has "+v+" logged.")) return;
+      entry.sets.pop(); saveDraft(); refreshCard(i); syncSave();
+    };
+    ctl.appendChild(rm);
+  }
+  foot.appendChild(ctl);
+
   if(ex.rest){
     const rb = el("button","rest-btn","Rest "+mmss(ex.rest));
     rb.onclick = ()=>startRest(ex.rest, ex.name);
@@ -899,6 +1052,14 @@ function exCard(ex, i){
   return card;
 }
 
+/* Swap one card in place — re-rendering the whole view would lose your scroll
+   position halfway down a session. */
+function refreshCard(i){
+  const cards = $("#todayBody").querySelectorAll(".ex");
+  if(!cards[i]) return renderToday();
+  cards[i].replaceWith(exCard(draftPhase().sessions[pickedSession].exercises[i], i));
+}
+
 function paint(cell, val, ex){
   cell.classList.remove("full","under","over");
   const fill = cell.querySelector(".fill");
@@ -914,12 +1075,14 @@ function syncSave(){
   const b = $("#saveBtn"); if(!b) return;
   const n = Object.values(draft.entries).reduce((a,e)=>a+e.sets.filter(v=>v!=null).length,0);
   b.disabled = n===0;
-  b.textContent = n===0 ? "Log a set to save" : "Save session · "+n+" sets";
+  b.textContent = n===0
+    ? (editing() ? "Clear every set to delete this session" : "Log a set to save")
+    : (editing() ? "Save changes · "+n+" sets" : "Save session · "+n+" sets");
 }
 
 function saveSession(){
   const entries = {};
-  const ph = phase(), exs = ph.sessions[pickedSession].exercises;
+  const ph = draftPhase(), exs = ph.sessions[pickedSession].exercises;
   Object.entries(draft.entries).forEach(([i,e])=>{
     const sets = e.sets.filter(v=>v!=null);
     if(!sets.length) return;
@@ -927,9 +1090,12 @@ function saveSession(){
   });
   if(!Object.keys(entries).length) return;
 
+  const prev = editing() ? S.sessions.find(s=>s.id===draft.editId) : null;
   const rec = {
-    id: Date.now(), date: draft.date, phase: ph.id, sessionKey: pickedSession, entries,
-    deload: inDeloadWeek() || undefined,
+    id: editing() ? draft.editId : Date.now(),
+    date: draft.date, phase: ph.id, sessionKey: pickedSession, entries,
+    /* A correction keeps whatever the session was at the time. */
+    deload: (prev ? prev.deload : inDeloadWeek()) || undefined,
     sleep: parseFloat(draft.meta.sleep) || undefined,
     note: (draft.meta.note||"").trim() || undefined
   };
@@ -938,6 +1104,17 @@ function saveSession(){
   const bw = parseFloat(draft.meta.bw);
   if(bw >= 30 && bw <= 200){
     S.weights = S.weights.filter(w=>w.date!==rec.date).concat({ date: rec.date, kg: bw });
+  }
+
+  if(editing()){
+    const at = S.sessions.findIndex(s=>s.id===draft.editId);
+    if(at >= 0) S.sessions[at] = rec; else S.sessions.push(rec);
+    save();
+    exitEdit();
+    stopRest();
+    toast("Session updated");
+    go("progress");
+    return;
   }
 
   const dup = S.sessions.findIndex(s=>s.date===rec.date && s.sessionKey===rec.sessionKey);
@@ -963,6 +1140,74 @@ function saveSession(){
       }
     }, 500);
   }
+}
+
+/* ============================================================
+   per-exercise history sheet
+   ============================================================ */
+function openHistory(ex){
+  const h = allHistory(ex.id);
+  const top = r => Math.max(...r.sets.filter(v=>v!=null).concat([0]));
+  const unit = ex.type==="hold" ? "s" : "";
+
+  const sheet = el("div","sheet");
+  const inner = el("div","sheet-in");
+
+  const close = ()=>{ sheet.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if(e.key==="Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  sheet.onclick = e => { if(e.target===sheet) close(); };
+
+  const hd = el("div","sheet-hd");
+  const ttl = el("div");
+  ttl.appendChild(el("div","sheet-t", ex.name));
+  ttl.appendChild(el("div","sheet-s", targetStr(ex)+" · "+(ex.type==="hold"?"seconds":"reps")));
+  hd.appendChild(ttl);
+  const x = el("button","sheet-x","Close");
+  x.onclick = close;
+  hd.appendChild(x);
+  inner.appendChild(hd);
+
+  const stats = el("div","stat-row");
+  const stat = (k,v)=>{ const d=el("div","stat"); d.appendChild(el("div","sv",v)); d.appendChild(el("div","sk",k)); return d; };
+  stats.appendChild(stat("Best set", h.length ? Math.max(...h.map(top))+unit : "–"));
+  stats.appendChild(stat("Sessions", String(h.length)));
+  stats.appendChild(stat("Last", h.length ? short(h[0].date) : "–"));
+  inner.appendChild(stats);
+
+  if(h.length >= 2){
+    const pts = h.slice().reverse().map(top);
+    inner.appendChild(chart("Top set", pts, pts[pts.length-1]+unit,
+      ex.type==="hold" ? "now" : "reps", "Every session, oldest first"));
+  }
+
+  if(h.length){
+    const rows = el("div","rows");
+    h.forEach(r=>{
+      const row = el("div","r");
+      row.appendChild(el("span","d", short(r.date)));
+      const m = el("div","m");
+      m.appendChild(el("div","hs", r.sets.map(v=>v==null?"–":v).join("  ")));
+      m.appendChild(el("div","ex-note", P.sessionNames[r.key] + (r.deload ? " · deload" : "")));
+      row.appendChild(m);
+      if(r.load) row.appendChild(el("span","x","+"+r.load+" kg"));
+      rows.appendChild(row);
+    });
+    inner.appendChild(rows);
+  }else{
+    inner.appendChild(el("div","empty","Nothing logged for this movement yet."));
+  }
+
+  /* Dips live in both Upper days on different prescriptions, so say which
+     track the progression rule is actually watching. */
+  if(new Set(h.map(r=>r.key)).size > 1){
+    inner.appendChild(el("p","hint",
+      "This movement appears in more than one session. Progression is judged separately for each, because the prescriptions differ."));
+  }
+
+  sheet.appendChild(inner);
+  document.body.appendChild(sheet);
+  x.focus();
 }
 
 /* ============================================================
@@ -1147,6 +1392,10 @@ function renderProgress(){
       if(s.sleep) m.appendChild(el("div","ex-note", s.sleep+" h sleep"));
       if(s.note) m.appendChild(el("div","ex-note", "“"+s.note+"”"));
       r.appendChild(m);
+      const ed = el("button","del","Edit");
+      ed.setAttribute("aria-label","Edit session from "+s.date);
+      ed.onclick = ()=>editSession(s);
+      r.appendChild(ed);
       const del = el("button","del","Delete");
       del.setAttribute("aria-label","Delete session from "+s.date);
       del.onclick = ()=>{

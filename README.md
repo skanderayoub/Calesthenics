@@ -13,6 +13,9 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 - **Tracks the phase gates.** Live progress against the Phase 2 and Phase 3 entry criteria, computed from your best single set. Offers to advance you when you clear all four.
 - **Charts bodyweight** against the 0.2–0.3 kg/month target, plus top sets for pull-ups and dips and your rolling sleep average.
 - **Logs sleep, bodyweight and notes** with the session, not in a separate screen.
+- **Bends to the actual session.** Add or drop a set on any exercise when you feel good or the bar is taken.
+- **Corrects the record.** Reopen any past session from Progress → Edit; saving replaces it in place and keeps its original date.
+- **Shows one movement's whole trajectory.** Tap an exercise name for every session it appears in, across both Upper days and all phases, with loads and a top-set chart.
 
 ## Files
 
