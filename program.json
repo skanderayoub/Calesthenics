@@ -57,6 +57,44 @@
       "body": "Breathing and heart rate spiking means conditioning — add two 20–30 min easy walks or rides on off days. Muscles burning out and arms giving up means you're resting too little between sets — time your rests for two weeks and see what changes."
     }
   ],
+  "skills": [
+    {
+      "id": "handstand",
+      "name": "Handstand",
+      "goal": "A free-standing hold",
+      "steps": [
+        { "name": "Wall handstand, 30 s", "ex": "wallHandstand", "target": 30, "unit": "s" },
+        { "name": "Wall handstand, 45 s", "ex": "wallHandstand", "target": 45, "unit": "s" },
+        { "name": "Wall handstand, 60 s", "ex": "wallHandstand", "target": 60, "unit": "s" },
+        { "name": "Wall negatives, 5 reps", "ex": "handstandNegatives", "target": 5, "unit": "reps" },
+        { "name": "Free-standing, 5 s", "ex": "freeHandstand", "target": 5, "unit": "s" },
+        { "name": "Free-standing, 20 s", "ex": "freeHandstand", "target": 20, "unit": "s" }
+      ]
+    },
+    {
+      "id": "lsit",
+      "name": "L-sit",
+      "goal": "Legs straight and level",
+      "steps": [
+        { "name": "Tuck L-sit, 15 s", "ex": "tuckLsit", "target": 15, "unit": "s" },
+        { "name": "Advanced tuck, 15 s", "ex": "tuckLsitAdv", "target": 15, "unit": "s" },
+        { "name": "One leg straight, 10 s", "ex": "fullLsit", "target": 10, "unit": "s" },
+        { "name": "One leg straight, 15 s", "ex": "fullLsit", "target": 15, "unit": "s" }
+      ]
+    },
+    {
+      "id": "muscleup",
+      "name": "Muscle-up",
+      "goal": "One clean rep on the bar",
+      "steps": [
+        { "name": "10 strict pull-ups", "ex": "pullups", "target": 10, "unit": "reps" },
+        { "name": "15 dips", "ex": "dips", "target": 15, "unit": "reps" },
+        { "name": "Explosive chest-to-bar, 3", "ex": "explosivePullups", "target": 3, "unit": "reps" },
+        { "name": "Straight-bar dips, 10", "ex": "straightBarDips", "target": 10, "unit": "reps" },
+        { "name": "Band-assisted muscle-up, 3", "ex": "bandMuscleups", "target": 3, "unit": "reps" }
+      ]
+    }
+  ],
   "phases": [
     {
       "id": "phase1",

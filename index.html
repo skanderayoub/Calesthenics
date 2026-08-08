@@ -205,6 +205,44 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .chip.on[data-v="12"]{color:var(--go);background:rgba(63,201,174,.13)}
 .chip.on[data-v="fail"]{color:var(--up);background:rgba(242,169,59,.13)}
 
+/* ---------- progress photos ---------- */
+.photos{margin-bottom:11px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.cmp-c img{
+  width:100%;aspect-ratio:3/4;object-fit:cover;display:block;
+  border-radius:7px;background:var(--surface2);border:1px solid var(--line);
+}
+.cmp-l{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--dim);
+  margin-top:6px;text-align:center;
+}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.thumb{flex:none;width:74px;padding:0}
+.thumb img{
+  width:74px;height:98px;object-fit:cover;display:block;
+  border-radius:6px;background:var(--surface2);border:1px solid var(--line);
+}
+.thumb .td{
+  display:block;font-family:var(--mono);font-size:10px;color:var(--dim);
+  margin-top:5px;text-align:center;
+}
+.photo-full{width:100%;border-radius:8px;display:block;margin-bottom:14px}
+
+/* ---------- skill ladders ---------- */
+.ladder{margin-top:2px}
+.step{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.step:last-child{border-bottom:0}
+.step .mk{font-family:var(--mono);font-size:11px;width:13px;text-align:center;color:var(--dim);flex:none}
+.step .lb{flex:1;min-width:0;font-size:14px;line-height:1.3;color:var(--muted)}
+.step .nm{
+  font-family:var(--mono);font-size:12px;color:var(--dim);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.step.done .mk,.step.done .nm{color:var(--go)}
+.step.done .lb{color:var(--ink)}
+.step.now .mk,.step.now .nm{color:var(--up)}
+.step.now .lb{color:var(--ink);font-weight:600}
+
 /* ---------- consistency grid ---------- */
 /* minmax(0,1fr) so the day columns can shrink below their content on a narrow
    phone instead of blowing the grid out sideways. */
@@ -547,6 +585,82 @@ function deloadDue(){
   if(weeks >= 8) return { why:"overdue", weeks, list };
   if(weeks >= 6) return { why:"due", weeks, list };
   return null;
+}
+
+/* ============================================================
+   progress photos — IndexedDB, because blobs don't belong in localStorage
+   ============================================================ */
+/* The goal in the program is "muscle + aesthetics". The scale is a poor proxy
+   for the second half of that; a photo from twelve weeks ago is not. */
+const PDB = "barlog-photos", PSTORE = "photos";
+let dbp = null, photoURLs = [];
+
+function pdb(){
+  if(dbp) return dbp;
+  dbp = new Promise((res, rej)=>{
+    const r = indexedDB.open(PDB, 1);
+    r.onupgradeneeded = ()=>{
+      const d = r.result;
+      if(!d.objectStoreNames.contains(PSTORE)) d.createObjectStore(PSTORE, { keyPath:"id" });
+    };
+    r.onsuccess = ()=>res(r.result);
+    r.onerror = ()=>rej(r.error);
+  });
+  return dbp;
+}
+function ptx(mode, fn){
+  return pdb().then(d => new Promise((res, rej)=>{
+    const tx = d.transaction(PSTORE, mode);
+    const out = fn(tx.objectStore(PSTORE));
+    tx.oncomplete = ()=>res(out && out.result !== undefined ? out.result : out);
+    tx.onerror = ()=>rej(tx.error);
+  }));
+}
+const photoPut = rec => ptx("readwrite", st => st.put(rec));
+const photoDel = id  => ptx("readwrite", st => st.delete(id));
+function photoAll(){
+  return pdb().then(d => new Promise((res, rej)=>{
+    const out = [];
+    const tx = d.transaction(PSTORE, "readonly");
+    tx.objectStore(PSTORE).openCursor().onsuccess = e =>{
+      const c = e.target.result;
+      if(c){ out.push(c.value); c.continue(); }
+    };
+    tx.oncomplete = ()=>res(out.sort((a,b)=> a.date<b.date?1:-1));   // newest first
+    tx.onerror = ()=>rej(tx.error);
+  }));
+}
+function releasePhotoURLs(){
+  photoURLs.forEach(u => URL.revokeObjectURL(u));
+  photoURLs = [];
+}
+function keepURL(blob){ const u = URL.createObjectURL(blob); photoURLs.push(u); return u; }
+
+/* Phone cameras produce 4-12 MB files. Downscale before storing, and honour
+   EXIF orientation so portrait shots don't land sideways. */
+async function shrink(file, max){
+  let src = null;
+  if(window.createImageBitmap){
+    try{ src = await createImageBitmap(file, { imageOrientation:"from-image" }); }catch(e){}
+  }
+  if(!src){
+    src = await new Promise((res, rej)=>{
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = ()=>{ URL.revokeObjectURL(url); res(img); };
+      img.onerror = ()=>{ URL.revokeObjectURL(url); rej(new Error("not an image")); };
+      img.src = url;
+    });
+  }
+  const iw = src.width, ih = src.height;
+  const scale = Math.min(1, max / Math.max(iw, ih));
+  const w = Math.round(iw*scale), h = Math.round(ih*scale);
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  c.getContext("2d").drawImage(src, 0, 0, w, h);
+  if(src.close) src.close();
+  const blob = await new Promise((res, rej)=>
+    c.toBlob(b => b ? res(b) : rej(new Error("encode failed")), "image/jpeg", 0.82));
+  return { blob, w, h };
 }
 
 /* ============================================================
@@ -1469,6 +1583,44 @@ function renderProgress(){
   }
   v.appendChild(sec1);
 
+  /* --- skills --- */
+  if(P.skills && P.skills.length){
+    const secS = el("section");
+    secS.appendChild(el("h2",null,"Skills"));
+    P.skills.forEach(sk=>{
+      const steps = sk.steps.map(st=>{
+        const got = best(st.ex);
+        return { st, got, done: got >= st.target };
+      });
+      /* Steps can fall out of order — you might clear straight-bar dips before
+         explosive pull-ups — so "next" is the first one still outstanding. */
+      const cleared = steps.filter(s=>s.done).length;
+      let at = steps.findIndex(s=>!s.done);
+      const complete = at < 0;
+
+      const card = el("div","gate"+(complete?" clear":""));
+      const hdr = el("div","hdr");
+      hdr.appendChild(el("span","name", sk.name));
+      hdr.appendChild(el("span","cnt", cleared+" / "+steps.length));
+      card.appendChild(hdr);
+
+      const lad = el("div","ladder");
+      steps.forEach((s,i)=>{
+        const row = el("div","step"+(s.done?" done":"")+(i===at?" now":""));
+        row.appendChild(el("span","mk", s.done ? "✓" : (i===at ? "●" : "○")));
+        row.appendChild(el("span","lb", s.st.name));
+        row.appendChild(el("span","nm", s.got+" / "+s.st.target+(s.st.unit==="s"?" s":"")));
+        lad.appendChild(row);
+      });
+      card.appendChild(lad);
+      card.appendChild(el("p","ex-note", complete
+        ? "Every step cleared — "+sk.goal.toLowerCase()+" is within reach. Go and try it."
+        : "Next up: "+steps[at].st.name+"."));
+      secS.appendChild(card);
+    });
+    v.appendChild(secS);
+  }
+
   /* --- consistency --- */
   const secC = el("section");
   secC.appendChild(el("h2",null,"Consistency"));
@@ -1621,6 +1773,17 @@ function renderProgress(){
   }
   v.appendChild(sec3);
 
+  /* --- photos --- */
+  const secP = el("section");
+  secP.appendChild(el("h2",null,"Photos"));
+  const pw = el("div","photos");
+  secP.appendChild(pw);
+  const addBtn = el("button","btn ghost","Add a photo");
+  addBtn.onclick = addPhoto;
+  secP.appendChild(addBtn);
+  v.appendChild(secP);
+  fillPhotos(pw);
+
   /* --- key lifts --- */
   const sec4 = el("section");
   sec4.appendChild(el("h2",null,"Top set"));
@@ -1681,6 +1844,114 @@ function renderProgress(){
     sec5.appendChild(e);
   }
   v.appendChild(sec5);
+}
+
+function addPhoto(){
+  const fi = document.createElement("input");
+  fi.type = "file";
+  fi.accept = "image/*";
+  fi.onchange = async ()=>{
+    const f = fi.files[0];
+    if(!f) return;
+    try{
+      toast("Processing…");
+      const { blob, w, h } = await shrink(f, 1400);
+      await photoPut({ id: Date.now(), date: today(), blob, w, h });
+      toast("Photo saved");
+      renderProgress();
+    }catch(e){
+      toast("Couldn't read that image");
+    }
+  };
+  fi.click();
+}
+
+function fillPhotos(wrap){
+  releasePhotoURLs();
+  photoAll().then(list=>{
+    wrap.innerHTML = "";
+    if(!list.length){
+      wrap.appendChild(el("div","empty",
+        "Nothing here yet. Same spot, same light, same time of day — once a fortnight is plenty. This is the only honest read on the aesthetics half of your goal."));
+      return;
+    }
+    if(list.length >= 2){
+      const first = list[list.length-1], latest = list[0];
+      const cmp = el("div","cmp");
+      [[first,"First"],[latest,"Latest"]].forEach(([p,lab])=>{
+        const c = el("div","cmp-c");
+        const im = document.createElement("img");
+        im.src = keepURL(p.blob);
+        im.alt = lab+" progress photo, "+p.date;
+        c.appendChild(im);
+        c.appendChild(el("div","cmp-l", lab+" · "+short(p.date)));
+        cmp.appendChild(c);
+      });
+      wrap.appendChild(cmp);
+      wrap.appendChild(el("p","hint", daysBetween(first.date, latest.date)+" days apart · "+list.length+" photos"));
+    }
+    const strip = el("div","strip");
+    list.forEach(p=>{
+      const b = el("button","thumb");
+      b.type = "button";
+      const im = document.createElement("img");
+      im.src = keepURL(p.blob);
+      im.alt = "Progress photo from "+p.date;
+      im.loading = "lazy";
+      b.appendChild(im);
+      b.appendChild(el("span","td", short(p.date)));
+      b.onclick = ()=>openPhoto(p);
+      strip.appendChild(b);
+    });
+    wrap.appendChild(strip);
+  }).catch(()=>{
+    wrap.innerHTML = "";
+    wrap.appendChild(el("div","empty","This browser won't open the photo store, so photos are unavailable here."));
+  });
+}
+
+function openPhoto(p){
+  const sheet = el("div","sheet");
+  const inner = el("div","sheet-in");
+  const close = ()=>{ URL.revokeObjectURL(url); sheet.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if(e.key==="Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  sheet.onclick = e => { if(e.target===sheet) close(); };
+
+  const hd = el("div","sheet-hd");
+  const t = el("div");
+  t.appendChild(el("div","sheet-t", p.date));
+  t.appendChild(el("div","sheet-s", p.w+" × "+p.h+" · "+Math.round(p.blob.size/1024)+" KB"));
+  hd.appendChild(t);
+  const x = el("button","sheet-x","Close");
+  x.onclick = close;
+  hd.appendChild(x);
+  inner.appendChild(hd);
+
+  const url = URL.createObjectURL(p.blob);
+  const im = document.createElement("img");
+  im.className = "photo-full";
+  im.src = url;
+  im.alt = "Progress photo from "+p.date;
+  inner.appendChild(im);
+
+  const dl = el("button","btn ghost","Download");
+  dl.onclick = ()=>{
+    const a = document.createElement("a");
+    a.href = url; a.download = "barlog-"+p.date+".jpg"; a.click();
+  };
+  inner.appendChild(dl);
+
+  const del = el("button","btn danger","Delete this photo");
+  del.onclick = ()=>{
+    if(!confirm("Delete the photo from "+p.date+"? Export it first if you want to keep it.")) return;
+    photoDel(p.id).then(()=>{ close(); renderProgress(); toast("Photo deleted"); });
+  };
+  inner.appendChild(del);
+
+  sheet.appendChild(inner);
+  document.body.appendChild(sheet);
+  x.focus();
 }
 
 function chart(title, vals, now, unit, sub){
@@ -1876,6 +2147,18 @@ function renderData(){
     + (persisted ? "storage marked persistent" : "stored in this browser only");
   s3.appendChild(stat);
 
+  /* Blobs can't ride along in a JSON file, so say so plainly rather than let
+     someone assume their export is complete. */
+  const pstat = el("p","hint");
+  pstat.textContent = "Photos live in a separate store and are not part of the JSON export.";
+  s3.appendChild(pstat);
+  photoAll().then(l=>{
+    if(!l.length) return;
+    pstat.textContent = l.length===1
+      ? "1 photo lives in a separate store and is not part of the JSON export — download it from Progress."
+      : l.length+" photos live in a separate store and are not part of the JSON export — download them individually from Progress.";
+  }).catch(()=>{});
+
   const ex = el("button","btn ghost","Export JSON");
   ex.onclick = ()=>{ exportJSON(); renderData(); };
   s3.appendChild(ex);
@@ -1907,10 +2190,12 @@ function renderData(){
 
   const wipe = el("button","btn danger","Erase everything");
   wipe.onclick = ()=>{
-    if(!confirm("Erase all sessions and weigh-ins? Export first if you want a copy.")) return;
+    if(!confirm("Erase all sessions, weigh-ins and photos? Export first if you want a copy.")) return;
     if(!confirm("Last check — this cannot be undone.")) return;
     S = structuredClone(blank); save();
     localStorage.removeItem(DRAFT);
+    releasePhotoURLs();
+    photoAll().then(l => Promise.all(l.map(p=>photoDel(p.id)))).catch(()=>{});
     pickedSession = sessionsOf(phase())[0];
     draft = newDraft(pickedSession);
     renderAll(); toast("Erased");

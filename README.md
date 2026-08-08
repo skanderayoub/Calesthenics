@@ -13,6 +13,8 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 - **Times your rests.** Logging a set starts the prescribed countdown, with a drain bar you can read from arm's length off the bar. Holds a screen wake lock while resting, so the alarm still fires.
 - **Tracks the phase gates.** Live progress against the Phase 2 and Phase 3 entry criteria, computed from your best single set. Offers to advance you when you clear all four.
 - **Charts bodyweight** against the 0.2–0.3 kg/month target, plus top sets for pull-ups and dips and your rolling sleep average.
+- **Tracks the skills, not just the sets.** Handstand, L-sit and muscle-up as ladders with "you are here" — each step scored against your best logged set, so the muscle-up stops being a vague someday and becomes 2 of 5.
+- **Progress photos.** Camera or gallery, downscaled to 1400 px and stored in IndexedDB, with first-versus-latest side by side. The scale is a poor proxy for the aesthetics half of the goal.
 - **Shows whether you're actually training.** A week-by-week grid of trained days, missed programmed days and rest days, against the program's 4-day target.
 - **Records effort.** Three chips per exercise — easy / 1–2 left / to failure — appearing once you've logged a set. The program asks for 1–2 reps in reserve, and going to failure across a whole session now gets called out.
 - **Logs sleep, bodyweight and notes** with the session, not in a separate screen.
@@ -79,5 +81,7 @@ Keep `id` stable when a movement carries over between phases, or you'll lose its
 ## Backup
 
 Data is per-browser and per-device. Clearing site data erases it.
+
+**Photos are not in the JSON export.** They live in a separate IndexedDB store because blobs can't ride along in a JSON file; download them individually from Progress if you want copies.
 
 The app asks the browser to mark its storage persistent (granted without a prompt for installed PWAs on most platforms), and nags you on the Today screen once eight sessions have accumulated since your last export. **Data → Export JSON** writes a file; **Import JSON** restores it or moves it to another device. Treat the export as the real backup — the persistence flag is a request, not a guarantee.
