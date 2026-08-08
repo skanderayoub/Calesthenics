@@ -13,6 +13,8 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 - **Times your rests.** Logging a set starts the prescribed countdown, with a drain bar you can read from arm's length off the bar. Holds a screen wake lock while resting, so the alarm still fires.
 - **Tracks the phase gates.** Live progress against the Phase 2 and Phase 3 entry criteria, computed from your best single set. Offers to advance you when you clear all four.
 - **Charts bodyweight** against the 0.2–0.3 kg/month target, plus top sets for pull-ups and dips and your rolling sleep average.
+- **Shows whether you're actually training.** A week-by-week grid of trained days, missed programmed days and rest days, against the program's 4-day target.
+- **Records effort.** Three chips per exercise — easy / 1–2 left / to failure — appearing once you've logged a set. The program asks for 1–2 reps in reserve, and going to failure across a whole session now gets called out.
 - **Logs sleep, bodyweight and notes** with the session, not in a separate screen.
 - **Bends to the actual session.** Add or drop a set on any exercise when you feel good or the bar is taken.
 - **Corrects the record.** Reopen any past session from Progress → Edit; saving replaces it in place and keeps its original date.

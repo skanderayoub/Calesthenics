@@ -189,6 +189,46 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .flag .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--up);text-transform:uppercase;font-weight:700}
 .flag .v{font-size:13px;color:var(--ink);line-height:1.35}
 
+/* ---------- effort chips ---------- */
+.effort{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.effort.hidden{display:none}
+.eff-k{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dim);margin-right:2px;
+}
+.chip{
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--muted);
+  border:1px solid var(--line);border-radius:20px;padding:6px 11px;
+}
+.chip.on{border-color:currentColor;font-weight:700}
+.chip.on[data-v="easy"]{color:var(--muted);background:rgba(122,145,152,.15)}
+.chip.on[data-v="12"]{color:var(--go);background:rgba(63,201,174,.13)}
+.chip.on[data-v="fail"]{color:var(--up);background:rgba(242,169,59,.13)}
+
+/* ---------- consistency grid ---------- */
+/* minmax(0,1fr) so the day columns can shrink below their content on a narrow
+   phone instead of blowing the grid out sideways. */
+.cal{
+  display:grid;grid-template-columns:auto repeat(7,minmax(0,1fr)) auto;
+  gap:5px 4px;align-items:center;margin-top:4px;
+}
+.cal>*{min-width:0}
+.cal .hd{font-family:var(--mono);font-size:9px;letter-spacing:0;color:var(--dim);text-align:center}
+.cal .wk{font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap;padding-right:5px;font-variant-numeric:tabular-nums}
+.cal .n{
+  font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right;
+  padding-left:7px;font-variant-numeric:tabular-nums;
+}
+.cal .n.hit{color:var(--go)}
+.dot{height:20px;border-radius:4px;background:none;position:relative}
+.dot.done{background:var(--go)}
+.dot.miss{border:1px solid var(--line)}
+.dot.rest::after{
+  content:"";position:absolute;left:50%;top:50%;width:3px;height:3px;
+  margin:-1.5px 0 0 -1.5px;border-radius:50%;background:var(--line);
+}
+.dot.future{opacity:.3}
+
 /* ---------- banners: deload, backup ---------- */
 .banner{
   display:flex;gap:12px;align-items:flex-start;
@@ -510,6 +550,42 @@ function deloadDue(){
 }
 
 /* ============================================================
+   consistency — 4 days a week is what the program actually asks for
+   ============================================================ */
+function weekStart(dateStr){
+  const d = new Date(dateStr+"T00:00");
+  d.setDate(d.getDate() - ((d.getDay()+6) % 7));   // back to Monday
+  return iso(d);
+}
+function weeklyTarget(){ return P.week.filter(x => x!=="rest").length; }
+
+/* A training day is a training day — two sessions in one day still count once,
+   because the target is days per week. */
+function consistency(weeks){
+  const done = new Set(S.sessions.map(s=>s.date));
+  const now = today(), base = weekStart(now);
+  const out = [];
+  for(let w=0; w<weeks; w++){
+    const start = new Date(base+"T00:00");
+    start.setDate(start.getDate() - w*7);
+    const days = [];
+    for(let i=0;i<7;i++){
+      const d = new Date(start);
+      d.setDate(d.getDate()+i);
+      const ds = iso(d);
+      days.push({
+        date: ds,
+        logged: done.has(ds),
+        planned: P.week[d.getDay()] !== "rest",
+        future: ds > now
+      });
+    }
+    out.push({ start: iso(start), days, count: days.filter(x=>x.logged).length });
+  }
+  return out;
+}
+
+/* ============================================================
    backup nudge — localStorage is the only copy
    ============================================================ */
 function unbackedUp(){ return S.sessions.length - (S.settings.backupAck||0); }
@@ -535,8 +611,14 @@ function history(sessionKey, exId){
   return S.sessions
     .filter(s => s.sessionKey===sessionKey && s.entries[exId] && s.entries[exId].sets.length)
     .sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0)
-    .map(s => ({ id:s.id, date:s.date, load:s.entries[exId].load||0, sets:s.entries[exId].sets }));
+    .map(s => ({ id:s.id, date:s.date, load:s.entries[exId].load||0,
+                 rir:s.entries[exId].rir||null, sets:s.entries[exId].sets }));
 }
+
+/* How hard it felt. The program asks for 1–2 reps in reserve on most sets,
+   and until now there was nowhere to record whether you complied. */
+const RIR = [["easy","Easy"],["12","1–2 left"],["fail","To failure"]];
+const rirLabel = v => (RIR.find(r=>r[0]===v)||[])[1] || null;
 
 /* Every session containing a movement, across both Upper days and all phases —
    the trajectory question, as opposed to the progression rule's per-session one. */
@@ -545,7 +627,8 @@ function allHistory(exId){
     .filter(s => s.entries[exId] && s.entries[exId].sets.length)
     .sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0)
     .map(s => ({ id:s.id, date:s.date, key:s.sessionKey, deload:!!s.deload,
-                 load:s.entries[exId].load||0, sets:s.entries[exId].sets }));
+                 load:s.entries[exId].load||0, rir:s.entries[exId].rir||null,
+                 sets:s.entries[exId].sets }));
 }
 
 /* Fires when every set hit the top of the range, at the same load,
@@ -761,6 +844,7 @@ function newDraft(sessionKey){
     d.entries[i] = {
       id: ex.id,
       load: h && h.length ? h[0].load : 0,
+      rir: null,
       sets: new Array(effSets(ex)).fill(null)
     };
   });
@@ -788,8 +872,8 @@ function draftFromSession(rec){
   sess.exercises.forEach((ex,i)=>{
     const e = rec.entries[ex.id];
     d.entries[i] = e
-      ? { id: ex.id, load: e.load||0, sets: e.sets.slice() }
-      : { id: ex.id, load: 0, sets: new Array(ex.sets).fill(null) };
+      ? { id: ex.id, load: e.load||0, rir: e.rir||null, sets: e.sets.slice() }
+      : { id: ex.id, load: 0, rir: null, sets: new Array(ex.sets).fill(null) };
   });
   return d;
 }
@@ -1021,6 +1105,29 @@ function exCard(ex, i){
   }
   card.appendChild(last);
 
+  /* Effort chips stay hidden until you've logged something, so an untouched
+     card stays clean. Your program prescribes 1–2 reps in reserve on most
+     sets; this is where you record whether you actually left them. */
+  const effRow = el("div","effort");
+  effRow.appendChild(el("span","eff-k","Effort"));
+  RIR.forEach(([v,label])=>{
+    const b = el("button","chip"+(entry.rir===v?" on":""), label);
+    b.type = "button";
+    b.dataset.v = v;
+    b.setAttribute("aria-pressed", String(entry.rir===v));
+    b.onclick = ()=>{
+      entry.rir = entry.rir===v ? null : v;
+      saveDraft();
+      effRow.querySelectorAll(".chip").forEach(c=>{
+        const on = c.dataset.v === entry.rir;
+        c.classList.toggle("on", on);
+        c.setAttribute("aria-pressed", String(on));
+      });
+    };
+    effRow.appendChild(b);
+  });
+  const syncEffort = ()=>effRow.classList.toggle("hidden", !entry.sets.some(v=>v!=null));
+
   const track = el("div","track");
   const suggest = h.length ? h[0].sets : null;   // what you did last time
   for(let s=0;s<entry.sets.length;s++){
@@ -1040,7 +1147,7 @@ function exCard(ex, i){
       const a = cell.querySelector(".accept");
       if(a) a.remove();
       paint(cell, v, ex);
-      saveDraft(); syncSave();
+      saveDraft(); syncSave(); syncEffort();
       if(ex.rest) startRest(ex.rest, ex.name+" · set "+(s+1)+" logged");
     };
 
@@ -1049,7 +1156,7 @@ function exCard(ex, i){
       if(inp.value!==v) inp.value=v;
       entry.sets[s] = v==="" ? null : parseInt(v,10);
       paint(cell, entry.sets[s], ex);
-      saveDraft(); syncSave();
+      saveDraft(); syncSave(); syncEffort();
     };
     /* Rest starts when you leave a set you just changed — not when you tab
        back over one you already filled. */
@@ -1119,13 +1226,25 @@ function exCard(ex, i){
     foot.appendChild(rb);
   }
   card.appendChild(foot);
+  card.appendChild(effRow);
+  syncEffort();
 
   if(ready){
+    const top2 = h.slice(0,2).map(r=>r.rir);
+    let caveat = "";
+    if(top2.length===2 && top2.every(x=>x==="fail"))
+      caveat = " You went to failure both times to get there — your program asks for 1–2 in reserve, so hold this load one more session before adding.";
+    else if(top2.length===2 && top2.every(x=>x==="easy"))
+      caveat = " Both sessions felt easy, so take a bigger jump than usual.";
+
     const f = el("div","flag");
     f.appendChild(el("span","k","Progress"));
-    f.appendChild(el("span","v", ex.loadable
-      ? "You hit "+ex.max+(ex.type==="hold"?" s":"")+" on every set twice. Add weight to the backpack and drop back to "+ex.min+"."
-      : "You hit "+ex.max+(ex.type==="hold"?" s":"")+" on every set twice. Move to the harder variation and drop back to "+ex.min+"."));
+    f.appendChild(el("span","v",
+      "You hit "+ex.max+(ex.type==="hold"?" s":"")+" on every set twice. "
+      + (ex.loadable
+          ? "Add weight to the backpack and drop back to "+ex.min+"."
+          : "Move to the harder variation and drop back to "+ex.min+".")
+      + caveat));
     card.appendChild(f);
   }
   if(ex.note) card.appendChild(el("p","ex-note", ex.note));
@@ -1167,7 +1286,7 @@ function saveSession(){
   Object.entries(draft.entries).forEach(([i,e])=>{
     const sets = e.sets.filter(v=>v!=null);
     if(!sets.length) return;
-    entries[e.id] = { load: e.load||0, sets, name: exs[i].name };
+    entries[e.id] = { load: e.load||0, sets, name: exs[i].name, rir: e.rir || undefined };
   });
   if(!Object.keys(entries).length) return;
 
@@ -1277,7 +1396,9 @@ function openHistory(ex){
       row.appendChild(el("span","d", short(r.date)));
       const m = el("div","m");
       m.appendChild(el("div","hs", r.sets.map(v=>v==null?"–":v).join("  ")));
-      m.appendChild(el("div","ex-note", P.sessionNames[r.key] + (r.deload ? " · deload" : "")));
+      m.appendChild(el("div","ex-note", P.sessionNames[r.key]
+        + (r.deload ? " · deload" : "")
+        + (r.rir ? " · "+rirLabel(r.rir).toLowerCase() : "")));
       row.appendChild(m);
       if(r.load) row.appendChild(el("span","x","+"+r.load+" kg"));
       rows.appendChild(row);
@@ -1348,6 +1469,50 @@ function renderProgress(){
   }
   v.appendChild(sec1);
 
+  /* --- consistency --- */
+  const secC = el("section");
+  secC.appendChild(el("h2",null,"Consistency"));
+  if(S.sessions.length){
+    const target = weeklyTarget();
+    const span = Math.min(10, Math.floor(daysBetween(weekStart(firstSessionDate()), weekStart(today()))/7) + 1);
+    const wks = consistency(span);
+    const card = el("div","gate");
+    const hdr = el("div","hdr");
+    hdr.appendChild(el("span","name","This week"));
+    hdr.appendChild(el("span","cnt", wks[0].count+" / "+target));
+    card.appendChild(hdr);
+
+    const cal = el("div","cal");
+    cal.appendChild(el("div","wk"));
+    ["M","T","W","T","F","S","S"].forEach(d=>cal.appendChild(el("div","hd",d)));
+    cal.appendChild(el("div","n"));
+    wks.forEach(w=>{
+      cal.appendChild(el("div","wk", short(w.start)));
+      w.days.forEach(d=>{
+        let cls = "dot";
+        if(d.logged) cls += " done";
+        else if(d.future) cls += (d.planned ? " miss future" : " rest future");
+        else if(d.planned) cls += " miss";
+        else cls += " rest";
+        const cell = el("div", cls);
+        cell.title = d.date + (d.logged ? " · trained" : d.planned ? " · missed" : " · rest day");
+        cal.appendChild(cell);
+      });
+      cal.appendChild(el("div","n"+(w.count>=target?" hit":""), String(w.count)));
+    });
+    card.appendChild(cal);
+
+    const complete = wks.slice(1);
+    const hits = complete.filter(w=>w.count>=target).length;
+    card.appendChild(el("p","ex-note", complete.length
+      ? "Hit the "+target+"-day target in "+hits+" of the last "+complete.length+" complete week"+(complete.length>1?"s":"")+"."
+      : "First week in. The program asks for "+target+" days."));
+    secC.appendChild(card);
+  }else{
+    secC.appendChild(el("div","empty","Nothing logged yet. The program asks for "+weeklyTarget()+" days a week — this grid will show whether you're getting them."));
+  }
+  v.appendChild(secC);
+
   /* --- deload --- */
   const inW = inDeloadWeek(), due = deloadDue(), regs = regressions();
   const secD = el("section");
@@ -1368,6 +1533,15 @@ function renderProgress(){
           ? "Your numbers are going backwards. That's the signal to deload, not the calendar."
           : "Six to eight weeks is the window, and you're at "+due.weeks+".")
       : "Take one every 6–8 weeks, or as soon as your numbers go backwards two sessions running."));
+
+    /* Section 9: burning out mid-session is usually effort or rest, not fitness. */
+    const recent = S.sessions.slice().sort((a,b)=>a.date<b.date?1:-1)[0];
+    const toFailure = recent ? Object.values(recent.entries).filter(e=>e.rir==="fail").length : 0;
+    if(toFailure >= 3){
+      dl.appendChild(el("p","ex-note",
+        "Last session you went to failure on "+toFailure+" exercises. Your program asks for 1–2 reps in reserve on most sets — that alone will bury recovery on 4 days a week."));
+    }
+
     if(regs.length){
       const rows = el("div","rows");
       rows.style.marginTop = "11px";
