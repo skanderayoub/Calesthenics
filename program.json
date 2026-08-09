@@ -79,6 +79,430 @@
       "body": "Breathing and heart rate spiking means conditioning — add two 20–30 min easy walks or rides on off days. Muscles burning out and arms giving up means you're resting too little between sets — time your rests for two weeks and see what changes."
     }
   ],
+  "howto": {
+    "wallHandstand": {
+      "setup": "Hands flat about 10 cm from the wall, shoulder-width, fingers spread and gripping the floor. Walk your feet up until your chest and hips are close to the wall — chest-to-wall, not belly-to-wall.",
+      "steps": [
+        "Push the floor away hard. Shoulders shrugged up towards your ears, elbows locked straight.",
+        "Ribs pulled down, glutes squeezed, toes pointed — one straight line from wrists to toes.",
+        "Look at the floor between your hands, not at the wall.",
+        "Shoulder taps: shift your weight fully onto one hand, tap the opposite shoulder, put it back. Slow, no rush."
+      ],
+      "mistakes": [
+        "Arched lower back with the ribs flared. The most common fault, and it's what makes the free-standing hold impossible later.",
+        "Bent elbows — the set is over the moment they bend.",
+        "Holding to failure. This is skill practice: come down with something left."
+      ]
+    },
+    "handstandNegatives": {
+      "setup": "Chest-to-wall handstand, hands close to the wall. This is a controlled lowering to the top of your head, then a press back up.",
+      "steps": [
+        "From the handstand, bend the elbows slowly and let your head travel forward and down towards the floor.",
+        "Touch the top of your head lightly — never crash onto it. Put a folded towel down.",
+        "Press back up by driving the floor away, keeping the body line tight.",
+        "If you can't press back up yet, do the lowering only and step down."
+      ],
+      "mistakes": [
+        "Elbows flaring wide instead of tracking forward.",
+        "Letting the hips pike as you descend — the legs should follow the torso, not lead it."
+      ]
+    },
+    "freeHandstand": {
+      "setup": "Away from the wall, on a flat, non-slip surface with room to bail. Learn the bail first: turn your shoulders and step down sideways, don't fold forwards.",
+      "steps": [
+        "Kick up gently — much lighter than feels right. Aim to arrive under balance, not past it.",
+        "Balance comes from the fingers: pressing the fingertips down stops you falling over, easing off lets you come back.",
+        "Keep the shrug, locked elbows and tight midline from the wall version.",
+        "Stack: wrists, shoulders, hips, toes in one line."
+      ],
+      "mistakes": [
+        "Kicking too hard and chasing the balance with your back instead of your hands.",
+        "Practising when already tired. This goes first in the session for a reason."
+      ]
+    },
+    "pullups": {
+      "setup": "Overhand grip, hands just outside shoulder width. Hang at full stretch with active shoulders — pull the shoulder blades down and back before the arms do anything.",
+      "steps": [
+        "Start each rep from a dead hang, arms straight.",
+        "Lead with the elbows, driving them down towards your ribs. Chest towards the bar.",
+        "Chin clearly over the bar, then lower under control over about 2 seconds.",
+        "Weighted: load the backpack high and tight so it doesn't swing."
+      ],
+      "mistakes": [
+        "Kipping — swinging the legs to generate momentum. If the hips move, the rep doesn't count here.",
+        "Half reps: not reaching a straight-arm hang at the bottom, or stopping at eyes-to-bar.",
+        "Shrugging up into the ears instead of pulling the shoulder blades down."
+      ]
+    },
+    "chinups": {
+      "setup": "Underhand grip, hands about shoulder-width. Same dead hang as the pull-up.",
+      "steps": [
+        "Dead hang, shoulder blades set down and back.",
+        "Pull until your chin clears the bar, keeping the elbows close to your sides.",
+        "Lower over about 2 seconds to a full straight-arm hang."
+      ],
+      "mistakes": [
+        "Letting the elbows drift forward, which turns it into a shoulder movement.",
+        "Cutting the bottom short. The stretched position is where most of the growth is."
+      ]
+    },
+    "explosivePullups": {
+      "setup": "Overhand grip, dead hang. The point is bar speed, not rep count — this is muscle-up preparation.",
+      "steps": [
+        "Pull as fast as you physically can from the bottom.",
+        "Aim to bring your chest, not your chin, to the bar. Sternum contact is the target.",
+        "Lower under control and reset fully between reps.",
+        "Stop the set the moment a rep visibly slows — a slow rep trains the wrong thing."
+      ],
+      "mistakes": [
+        "Grinding out extra slow reps to finish the set.",
+        "Throwing the head back to reach height instead of pulling higher."
+      ]
+    },
+    "pullupNegatives": {
+      "setup": "Jump or step up so your chin starts above the bar. You need a box, a low bar, or a good jump.",
+      "steps": [
+        "Get to the top position with your chin over the bar and chest close to it.",
+        "Lower over a full 5 seconds, counting it out.",
+        "Fight hardest in the bottom third, where you'll want to drop.",
+        "Step or jump back up — never lower and then try to pull out of the hang."
+      ],
+      "mistakes": [
+        "A 2-second drop dressed up as a negative. If you can't make 5 seconds, you're doing too many reps.",
+        "Relaxing the shoulders at the bottom and dropping into a dead hang."
+      ]
+    },
+    "dips": {
+      "setup": "Parallel bars, arms locked out, shoulders pushed down away from the ears. Slight forward lean of the torso, legs together or crossed behind.",
+      "steps": [
+        "Lower under control until your upper arms are roughly parallel to the floor — shoulders level with the elbows.",
+        "Keep the elbows tracking back and fairly close, not flared wide.",
+        "Press back to a full lockout without bouncing out of the bottom.",
+        "Weighted: bodyweight set first, then half load, then the working sets."
+      ],
+      "mistakes": [
+        "Shrugging — letting the shoulders ride up towards the ears at the bottom. This is the main cause of dip shoulder pain.",
+        "Going deeper than parallel before your shoulders are ready.",
+        "Sitting upright and bouncing. Lean forward slightly and control it."
+      ]
+    },
+    "straightBarDips": {
+      "setup": "A single straight bar at about hip-to-waist height. Start supported on top of the bar, arms locked, wrists over the bar, torso leaning forward over it.",
+      "steps": [
+        "Lean forward so the bar can pass in front of your chest as you descend.",
+        "Lower until your chest is near the bar and your upper arms are around parallel.",
+        "Press back up and finish leaning slightly over the bar, elbows locked.",
+        "This is the top half of a muscle-up. Treat it as skill plus strength."
+      ],
+      "mistakes": [
+        "Staying vertical — you'll hit the bar with your chest and have nowhere to go.",
+        "Letting the wrists sit behind the bar at the top instead of over it."
+      ]
+    },
+    "bandMuscleups": {
+      "setup": "Loop a band over the bar and put one foot or both knees in it. Overhand grip, thumbs over the bar if you can — it makes the transition much easier.",
+      "steps": [
+        "Explosive pull with a slight backwards swing, aiming chest to bar.",
+        "As you reach the top of the pull, drive the chest forward over the bar and roll the wrists over — this is the transition, and it's the whole exercise.",
+        "Finish with a straight-bar dip press to lockout.",
+        "Lower back down under control rather than dropping off."
+      ],
+      "mistakes": [
+        "Chasing reps instead of a clean transition. Three good ones beats ten scrambled.",
+        "Staying on a thick band. Drop band thickness as soon as the transition feels smooth."
+      ]
+    },
+    "invertedRows": {
+      "setup": "A bar at about hip height. Hang underneath it, overhand or neutral grip just outside shoulder width, heels on the floor, body in one straight line.",
+      "steps": [
+        "Squeeze glutes and brace the core so the hips don't sag — you're a plank hanging under a bar.",
+        "Pull the shoulder blades together first, then bend the elbows.",
+        "Touch your chest or lower ribs to the bar and hold for a beat.",
+        "Lower until the arms are straight and the shoulder blades come apart.",
+        "Feet elevated: heels on a bench or second bar to make it harder."
+      ],
+      "mistakes": [
+        "Sagging hips — the most common fault, and it lets you cheat the range.",
+        "Pulling with the arms only and never squeezing the shoulder blades.",
+        "Shortening the range at the top. Chest to bar or it doesn't count."
+      ]
+    },
+    "invertedRowsElev": {
+      "setup": "Same as the inverted row, with your heels on a bench or box roughly level with the bar so the body is horizontal or better.",
+      "steps": [
+        "Set the line first: heels up, hips lifted, body straight from shoulders to feet.",
+        "Pull the shoulder blades together, then the elbows, touching chest or lower ribs to the bar.",
+        "Lower to straight arms with the shoulder blades spreading apart."
+      ],
+      "mistakes": [
+        "Hips dropping the moment the feet go up — lower the elevation if you can't hold the line.",
+        "Bouncing the heels off the bench to start the rep."
+      ]
+    },
+    "pikePushups": {
+      "setup": "Hands and feet on the floor, hips high in an upside-down V. Walk the feet in until your torso is as close to vertical as your hamstrings allow.",
+      "steps": [
+        "Head points at the floor between your hands, hips stay high throughout.",
+        "Lower until the crown of your head lightly touches the floor.",
+        "Press back up to straight arms without letting the hips drop.",
+        "Feet elevated: heels on a chair or step to bring the shoulders more overhead."
+      ],
+      "mistakes": [
+        "Turning it into a normal push-up by letting the hips sink — then it's chest, not shoulders.",
+        "Lowering the head forward of the hands rather than between them."
+      ]
+    },
+    "pushupsElevated": {
+      "setup": "Feet on a bench or chair, hands slightly wider than shoulders, body in one straight line from heels to head.",
+      "steps": [
+        "Brace the core and squeeze the glutes so the hips don't sag.",
+        "Lower over 2 seconds until your chest is just off the floor, elbows at roughly 45° to the body.",
+        "Press up in 1 second to full lockout, letting the shoulder blades spread at the top."
+      ],
+      "mistakes": [
+        "Elbows flared to 90°, straight out from the shoulders.",
+        "Head dropping first, hips second. Everything moves together.",
+        "Bouncing off the floor at the bottom."
+      ]
+    },
+    "archerPushups": {
+      "setup": "Push-up position with the hands much wider than normal. One arm will work, the other stays nearly straight and acts as a kickstand.",
+      "steps": [
+        "Lower towards one hand, bending that elbow and keeping the other arm straight out to the side.",
+        "Chest comes down close to the working hand.",
+        "Press back up through the working arm. Do all reps on one side, then switch — or alternate.",
+        "Turn the straight hand's fingers outwards if the shoulder feels pinched."
+      ],
+      "mistakes": [
+        "Hips twisting to help. Keep them square to the floor.",
+        "Bending the straight arm to share the load, which turns it back into a wide push-up."
+      ]
+    },
+    "bandCurls": {
+      "setup": "Stand on the middle of the band, feet hip-width, a handle or end in each hand, palms forward. Stand wider for more tension.",
+      "steps": [
+        "Elbows pinned to your sides — they don't travel forward.",
+        "Curl to full contraction and squeeze at the top, where band tension is highest.",
+        "Lower over 2 full seconds against the band rather than letting it snap back."
+      ],
+      "mistakes": [
+        "Swinging the torso to start the rep.",
+        "Letting the band pull your hands down fast. The lowering is half the exercise."
+      ]
+    },
+    "facePulls": {
+      "setup": "Anchor the band at roughly face height, or loop it around a bar or post. Step back until there's tension with your arms straight out in front. This is a light shoulder-health movement, not a strength lift.",
+      "steps": [
+        "Pull the band towards your face, leading with the elbows and keeping them high — at or above shoulder height.",
+        "Finish with your hands beside your ears and the band near your forehead, as if doing a double bicep pose.",
+        "Squeeze the shoulder blades together and hold for a beat.",
+        "Return slowly to straight arms."
+      ],
+      "mistakes": [
+        "Going too heavy and rowing it to the chest with the lats. Lighter band, higher elbows.",
+        "Elbows dropping below shoulder height, which turns it into a row.",
+        "Chasing reps or load. Keep it at 15 quality reps — it is deliberately not a progression lift."
+      ]
+    },
+    "tuckLsit": {
+      "setup": "Parallel bars, dip bars, or the floor with hands flat beside your hips. Push down hard through straight arms and lift your body clear.",
+      "steps": [
+        "Lock the elbows and push the shoulders down away from the ears — this is what creates the height.",
+        "Tuck the knees up towards your chest, thighs around 90° to the torso.",
+        "Round the lower back slightly and pull the ribs down. Hold.",
+        "On the floor, elevate the hands on books or blocks if you can't clear your feet yet."
+      ],
+      "mistakes": [
+        "Shrugged shoulders and bent elbows — the two together make the hold impossible.",
+        "Leaning back to keep the knees up instead of compressing the hips."
+      ]
+    },
+    "tuckLsitAdv": {
+      "setup": "Same as the tuck L-sit, but the thighs now come up to horizontal with the knees still bent at 90°, shins parallel to the floor.",
+      "steps": [
+        "Set the depression first: elbows locked, shoulders pushed down.",
+        "Bring the thighs to parallel with the floor and hold the shins level.",
+        "Keep the lower back flat rather than arched — you should feel this in the hip flexors and abs."
+      ],
+      "mistakes": [
+        "Letting the thighs drop back towards a normal tuck as the hold gets hard. Stop the set instead.",
+        "Holding your breath. Breathe shallowly and steadily."
+      ]
+    },
+    "fullLsit": {
+      "setup": "From the advanced tuck, straighten one leg fully while the other stays tucked. Alternate which leg extends between sets.",
+      "steps": [
+        "Elbows locked, shoulders pushed down, hips as high as you can get them.",
+        "Extend one leg straight out, toes pointed, held at or above hip height.",
+        "Keep the tucked knee at 90° rather than letting it drift down.",
+        "Hold, then swap legs on the next set."
+      ],
+      "mistakes": [
+        "Extending the leg but letting the whole body sink — height first, then extension.",
+        "Only ever training one side."
+      ]
+    },
+    "pikeCompression": {
+      "setup": "Sit on the floor with your legs straight out in front, hands flat on the floor beside your hips. Sit tall — don't lean back.",
+      "steps": [
+        "Push into the floor with your hands and pull the toes back towards you.",
+        "Lift both heels off the floor using the hip flexors. Even a centimetre counts.",
+        "Hold for a second at the top, lower under control.",
+        "Keep the knees locked straight the whole time."
+      ],
+      "mistakes": [
+        "Leaning back to make the lift easier. That's the exact cheat the L-sit won't allow.",
+        "Bending the knees. Straight legs or it isn't training compression."
+      ]
+    },
+    "hollowHold": {
+      "setup": "Lie on your back, arms overhead, legs straight. Press your lower back flat into the floor before you lift anything — this is the whole exercise.",
+      "steps": [
+        "Pull the ribs down towards the hips and flatten the lumbar spine.",
+        "Lift the shoulder blades and legs off the floor, keeping that flat back.",
+        "Point the toes, squeeze everything, and breathe shallowly.",
+        "Too hard? Bend the knees or bring the arms to your sides — never let the back arch."
+      ],
+      "mistakes": [
+        "A gap under the lower back. If you can slide a hand under, raise the legs higher until you can't.",
+        "Straining the neck. Keep the chin slightly tucked and look at your knees."
+      ]
+    },
+    "sidePlank": {
+      "setup": "Lie on your side, forearm on the floor with the elbow directly under the shoulder. Legs stacked, feet on top of each other.",
+      "steps": [
+        "Lift the hips until your body is one straight line from ankle to head.",
+        "Keep the hips stacked vertically — don't let the top hip roll forward or back.",
+        "Push the bottom shoulder away from the floor rather than sinking into it.",
+        "Easier version: bottom knee bent and on the floor."
+      ],
+      "mistakes": [
+        "Hips sagging towards the floor as the set goes on.",
+        "Rotating towards the floor, which turns it back into a front plank."
+      ]
+    },
+    "kneeRaises": {
+      "setup": "Dead hang from the bar, overhand grip, shoulders active — pulled down, not slumped into the joints.",
+      "steps": [
+        "Kill any swing before the first rep.",
+        "Raise the knees to at least hip height, curling the pelvis up slightly at the top.",
+        "Lower slowly and under control — do not let the legs fall.",
+        "Pause a beat at the bottom if you start swinging."
+      ],
+      "mistakes": [
+        "Using a swing to throw the knees up. Slow beats high.",
+        "Only lifting the knees without any pelvic curl, which leaves the lower abs out of it."
+      ]
+    },
+    "legRaises": {
+      "setup": "Dead hang, active shoulders, legs straight and together. This is the knee raise with the knees locked.",
+      "steps": [
+        "No swing. Brace before the first rep.",
+        "Raise straight legs to at least hip height — towards the bar if you can.",
+        "Point the toes and keep the knees locked throughout.",
+        "Lower over 2–3 seconds under full control."
+      ],
+      "mistakes": [
+        "Bending the knees as it gets hard. Drop back to knee raises instead.",
+        "Dropping the legs. The lowering is where the strength comes from."
+      ]
+    },
+    "bulgarian": {
+      "setup": "Stand about a stride in front of a bench, chair or step. Put the top of one foot on it behind you. The front foot should be far enough forward that the knee stays over the mid-foot at the bottom.",
+      "steps": [
+        "Torso slightly forward, chest up, front foot flat.",
+        "Lower straight down until the front thigh is around parallel and the back knee is close to the floor.",
+        "Drive up through the front heel. The back leg is balance, not power.",
+        "Weighted: backpack on your back, or hold it to your chest for better balance."
+      ],
+      "mistakes": [
+        "Standing too close to the bench, which jams the front knee forward and hurts.",
+        "Pushing off the back foot to help.",
+        "Finding the balance with the set. Steady yourself with a fingertip on a wall if you need to."
+      ]
+    },
+    "stepUps": {
+      "setup": "A box, bench or step at roughly knee height. Stand facing it, one whole foot on the surface.",
+      "steps": [
+        "Shift your weight over the top foot, chest up.",
+        "Stand up by pushing through that heel — no pushing off, no hopping with the bottom foot.",
+        "Stand fully tall at the top, then lower over 2–3 seconds under control.",
+        "The bottom foot touches the floor lightly; it never takes the load."
+      ],
+      "mistakes": [
+        "Pushing off the trailing leg, which is what turns this into a jump.",
+        "Dropping back down instead of lowering. Half the point is the lowering."
+      ]
+    },
+    "pistolAssisted": {
+      "setup": "Hold a pole, door frame or low bar for balance, or stand in front of a bench you can sit back to. Stand on one leg with the other extended in front.",
+      "steps": [
+        "Sit back and down slowly, keeping the free leg off the floor and the heel of the standing foot planted.",
+        "Use the hands only for balance and the minimum assistance you need.",
+        "Go as deep as you can control — a bench behind you gives a consistent depth to aim for.",
+        "Drive back up through the whole foot."
+      ],
+      "mistakes": [
+        "Pulling yourself up with the arms. They're a kickstand, not a rope.",
+        "The standing heel lifting off the floor. Work on ankle mobility or elevate the heel slightly."
+      ]
+    },
+    "pistolSquats": {
+      "setup": "Stand on one leg, other leg straight out in front, arms out for counterbalance. Nothing to hold.",
+      "steps": [
+        "Lower slowly, sitting back and keeping the free leg off the floor throughout.",
+        "Go all the way down until the hamstring meets the calf.",
+        "Keep the standing heel down and the chest up.",
+        "Drive back up without rocking or bouncing out of the bottom."
+      ],
+      "mistakes": [
+        "Bouncing out of the bottom, which is how knees get irritated.",
+        "The free leg touching down to help.",
+        "Rushing back to full pistols after a layoff. Drop to assisted."
+      ]
+    },
+    "slRdl": {
+      "setup": "Stand on one leg, a soft bend in that knee. The other leg will travel straight back as a counterweight.",
+      "steps": [
+        "Hinge at the hip — push the hips backwards, don't bend at the waist.",
+        "Let the torso and back leg move together like a see-saw until the torso is near horizontal.",
+        "Back flat throughout, shoulders square to the floor.",
+        "Feel the stretch in the standing hamstring, then drive the hips forward to stand up.",
+        "Weighted: hold the backpack in the opposite hand to the standing leg."
+      ],
+      "mistakes": [
+        "Squatting instead of hinging — if the knee travels forward, it's a squat.",
+        "Rounding the lower back at the bottom.",
+        "The hips rotating open. Keep both hip bones pointing at the floor."
+      ]
+    },
+    "nordics": {
+      "setup": "Kneel on something soft with your ankles anchored — under a sofa, a loaded bar, or a partner holding them. Body straight from knees to head.",
+      "steps": [
+        "Hands up in front of your chest, ready to catch yourself.",
+        "Lower forwards as slowly as you possibly can, resisting the whole way with the hamstrings.",
+        "Catch yourself with your hands when you lose control, then push back to the start.",
+        "Full Nordics: pull yourself back up with the hamstrings using no more than a light push."
+      ],
+      "mistakes": [
+        "Breaking at the hips. Keep a straight line from knees to shoulders — this is the single most common fault.",
+        "Dropping fast. If you can't slow it down, reduce range or add more of a hand push."
+      ]
+    },
+    "calfRaise": {
+      "setup": "Ball of one foot on the edge of a step, heel hanging free. Hold something for balance. The other foot is off the step.",
+      "steps": [
+        "Drop the heel as far below the step as your ankle allows and pause in the stretch.",
+        "Push up onto the ball of the foot as high as you can and squeeze for a second at the top.",
+        "Lower over 2–3 seconds back into the stretch.",
+        "Weighted: backpack on."
+      ],
+      "mistakes": [
+        "Short, bouncy reps at the top. The full stretch at the bottom is where this works.",
+        "Bending the knee to help. Keep it straight."
+      ]
+    }
+  },
   "skills": [
     {
       "id": "handstand",

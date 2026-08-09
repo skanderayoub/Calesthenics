@@ -17,15 +17,26 @@
   --surface2:#18262A;
   --line:#22363B;
   --line-soft:#1A2A2E;
+  /* Three text tiers, every one of them ≥4.5:1 on --surface. The old scale
+     bottomed out at 2.8:1, which is unreadable on a bright day at the park —
+     exactly where this app gets used. Values: 15.3 / 8.9 / 6.0. */
   --ink:#E9F2F3;
-  --muted:#7B959B;
-  --dim:#4E656B;
+  --muted:#A7BEC4;
+  --dim:#829CA2;
+  /* Decoration only — rules, dotted underlines, disabled fills. Never text. */
+  --faint:#556E74;
   --go:#3FC9AE;
   --up:#F2A93B;
   --warn:#E5544C;
   --mono:ui-monospace,"SF Mono","Cascadia Mono","Segoe UI Mono",Menlo,Consolas,monospace;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --pad:16px;
+  /* One radius scale, three steps. Everything rounds to one of these. */
+  --r-sm:6px;
+  --r-md:10px;
+  --r-lg:16px;
+  /* Thumb minimum. Sweaty hands, mid-set, one-handed. */
+  --tap:44px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -75,7 +86,7 @@ header{
 #restbar.on{display:flex}
 #restbar .t{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 #restbar .lbl{flex:1;font-size:13px;color:var(--muted)}
-#restbar button{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);padding:6px 10px;border:1px solid var(--line);border-radius:4px}
+#restbar button{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--muted);min-height:var(--tap);padding:0 13px;border:1px solid var(--line);border-radius:var(--r-sm)}
 
 /* ---------- layout ---------- */
 main{max-width:600px;margin:0 auto;padding:0 var(--pad)}
@@ -90,14 +101,14 @@ h2{
 /* ---------- segmented session picker ---------- */
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
 .seg button{
-  padding:11px 4px;border:1px solid var(--line);border-radius:6px;background:var(--surface);
+  min-height:var(--tap);padding:0 4px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
   font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
 }
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
 .seg button:disabled{opacity:.35}
 
 /* ---------- warmup ---------- */
-details.warm{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);margin-bottom:18px}
+details.warm{border:1px solid var(--line-soft);border-radius:var(--r-md);background:var(--surface);margin-bottom:18px}
 details.warm summary{
   padding:12px 14px;list-style:none;cursor:pointer;
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
@@ -112,17 +123,21 @@ details.warm li{margin:6px 0}
 /* ---------- exercise card ---------- */
 .ex{
   border:1px solid var(--line-soft);border-top:2px solid var(--line);
-  border-radius:8px;background:var(--surface);padding:13px 13px 11px;margin-bottom:12px;
+  border-radius:var(--r-md);background:var(--surface);padding:14px 14px 12px;margin-bottom:12px;
   transition:border-color .3s;
 }
 .ex.ready{border-top-color:var(--up)}
 .ex-hd{display:flex;align-items:baseline;gap:9px}
 .ex-n{font-family:var(--mono);font-size:11px;color:var(--dim);font-weight:700;min-width:14px}
+/* Padding grows the hit area to 45px; the matching negative margin keeps the
+   text exactly where it was. This is the only way into the exercise sheet
+   now, so it has to be catchable without looking. */
 button.ex-name{
-  flex:1;min-width:0;text-align:left;padding:0;font-weight:600;font-size:15.5px;
+  flex:1;min-width:0;text-align:left;font-weight:600;font-size:15.5px;
   line-height:1.25;color:var(--ink);align-self:flex-start;
+  padding:13px 0;margin:-13px 0;
 }
-button.ex-name .ex-label{border-bottom:1px dotted var(--dim);padding-bottom:1px}
+button.ex-name .ex-label{border-bottom:1px dotted var(--faint);padding-bottom:1px}
 button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .ex-target{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .ex-skill{
@@ -136,15 +151,29 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .ex-last b{color:var(--muted);font-weight:400;letter-spacing:.08em}
 
 /* the signature: rep-range track */
-.track{display:flex;gap:5px;margin:10px 0 0}
+.track{display:flex;gap:5px;margin:11px 0 0}
 .cell{
-  position:relative;flex:1;min-width:0;height:52px;border:1px solid var(--line);
-  border-radius:5px;background:var(--surface2);overflow:hidden;display:block;
+  position:relative;flex:1;min-width:0;height:56px;border:1px solid var(--line);
+  border-radius:var(--r-sm);background:var(--surface2);overflow:hidden;display:block;
+  transition:border-color .18s ease;
 }
 .cell .fill{
   position:absolute;left:0;right:0;bottom:0;height:0;
   background:var(--go);opacity:.17;transition:height .18s ease;
 }
+/* Last session's number, drawn at the height it occupies in the rep range.
+   The whole program is "beat last time, twice" — so the reference stays on
+   screen after you type instead of disappearing with the placeholder. Fill
+   above the line means you beat it; the line turns green to confirm. */
+.cell .mark{
+  position:absolute;left:0;right:0;height:0;z-index:1;pointer-events:none;
+  border-top:1px dashed var(--faint);
+  transition:bottom .18s ease,border-color .18s ease,opacity .18s ease;
+}
+.cell.beat .mark{border-top-color:var(--go);opacity:.7}
+/* Nothing typed yet — the dashed cell is already saying "last time", so a
+   second dashed line inside it is noise. */
+.cell.sugg .mark{opacity:0}
 .cell input{
   position:relative;width:100%;height:100%;border:0;background:transparent;text-align:center;
   font-family:var(--mono);font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;
@@ -162,23 +191,30 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .cell.over{border-color:var(--go)}
 .cell.under input{color:var(--ink)}
 
-.ex-foot{display:flex;align-items:center;gap:8px;margin-top:9px;min-height:32px}
-.load{display:flex;align-items:center;gap:6px}
+/* Everything in the footer clears 44px. It gets used one-handed, mid-set,
+   with chalk on your fingers — density is not the constraint here. */
+.ex-foot{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;min-height:var(--tap)}
+.load{display:flex;align-items:center;gap:7px}
 .load label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
 .load input{
-  width:52px;padding:5px 6px;background:var(--surface2);border:1px solid var(--line);border-radius:4px;
-  font-family:var(--mono);font-size:13px;text-align:center;font-variant-numeric:tabular-nums;
+  width:56px;height:var(--tap);padding:0 6px;background:var(--surface2);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  font-family:var(--mono);font-size:14px;text-align:center;font-variant-numeric:tabular-nums;
 }
 .setctl{display:flex;gap:6px}
 .setctl button{
-  font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--muted);
-  border:1px solid var(--line);border-radius:5px;padding:7px 9px;white-space:nowrap;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  min-height:var(--tap);padding:0 12px;white-space:nowrap;
 }
 .setctl button:active{background:var(--surface2)}
+/* Grows into whatever room is left, so it sits right on a wide screen and
+   takes its own full-width row on a phone. It's the control you hit between
+   every set — it should be the easiest thing in the footer to land on. */
 .rest-btn{
-  margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
-  color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:7px 11px;
-  font-variant-numeric:tabular-nums;
+  flex:1 1 130px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  color:var(--muted);border:1px solid var(--line);border-radius:var(--r-sm);
+  min-height:var(--tap);padding:0 14px;white-space:nowrap;font-variant-numeric:tabular-nums;
 }
 .rest-btn:active{background:var(--surface2)}
 /* superset bracket — the pair reads as one block, not two exercises that happen to be adjacent */
@@ -208,8 +244,9 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
   color:var(--dim);margin-right:2px;
 }
 .chip{
-  font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--muted);
-  border:1px solid var(--line);border-radius:20px;padding:6px 11px;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--muted);
+  border:1px solid var(--line);border-radius:var(--tap);
+  min-height:var(--tap);padding:0 15px;
 }
 .chip.on{border-color:currentColor;font-weight:700}
 .chip.on[data-v="easy"]{color:var(--muted);background:rgba(122,145,152,.15)}
@@ -281,7 +318,7 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 /* ---------- banners: deload, backup ---------- */
 .banner{
   display:flex;gap:12px;align-items:flex-start;
-  padding:13px;border-radius:8px;margin-bottom:14px;border:1px solid var(--line);
+  padding:13px;border-radius:var(--r-md);margin-bottom:14px;border:1px solid var(--line);
 }
 .banner .b-k{
   font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
@@ -291,8 +328,9 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .banner .b-m b{display:block;font-size:15px;color:var(--ink);margin-bottom:3px;font-weight:600}
 .banner .acts{display:flex;flex-direction:column;gap:6px}
 .banner .acts button{
-  font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:8px 12px;
-  border-radius:5px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  min-height:var(--tap);padding:0 13px;
+  border-radius:var(--r-sm);border:1px solid var(--line);color:var(--muted);white-space:nowrap;
 }
 .banner.warn{border-color:rgba(242,169,59,.4);background:rgba(242,169,59,.06)}
 .banner.warn .b-k{color:var(--up)}
@@ -301,7 +339,7 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .banner.info .b-k{color:var(--go)}
 
 /* ---------- session meta: sleep, bodyweight, notes ---------- */
-.meta{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);padding:13px;margin-bottom:12px}
+.meta{border:1px solid var(--line-soft);border-radius:var(--r-md);background:var(--surface);padding:13px;margin-bottom:12px}
 .meta .row{display:flex;gap:10px;margin-bottom:11px}
 .meta .cel{flex:1;min-width:0}
 .meta label{
@@ -309,15 +347,15 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
   text-transform:uppercase;color:var(--dim);margin-bottom:6px;
 }
 .meta input,.meta textarea{
-  width:100%;padding:10px;background:var(--surface2);border:1px solid var(--line);
-  border-radius:5px;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;
+  width:100%;min-height:var(--tap);padding:10px;background:var(--surface2);border:1px solid var(--line);
+  border-radius:var(--r-sm);font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;
 }
 .meta textarea{font-family:var(--sans);min-height:66px;resize:vertical;line-height:1.45;font-size:14px}
 .meta input::placeholder,.meta textarea::placeholder{color:var(--dim)}
 
 /* ---------- buttons ---------- */
 .btn{
-  display:block;width:100%;padding:15px;border-radius:7px;background:var(--go);color:#06100F;
+  display:block;width:100%;min-height:52px;padding:15px;border-radius:var(--r-md);background:var(--go);color:#06100F;
   font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
 }
 .btn:disabled{background:var(--surface2);color:var(--dim)}
@@ -326,7 +364,7 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .btn+.btn{margin-top:9px}
 
 /* ---------- gate ---------- */
-.gate{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:15px}
+.gate{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);padding:15px}
 .gate .hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:14px}
 .gate .hdr .name{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
 .gate .hdr .cnt{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -342,7 +380,7 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .gate.clear{border-color:var(--go)}
 
 /* ---------- charts ---------- */
-.chart{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);padding:14px;margin-bottom:12px}
+.chart{border:1px solid var(--line-soft);border-radius:var(--r-md);background:var(--surface);padding:14px;margin-bottom:12px}
 .chart .top{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
 .chart .top .t{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .chart .top .now{margin-left:auto;font-family:var(--mono);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
@@ -351,15 +389,15 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 .chart svg{display:block;width:100%;height:78px;overflow:visible}
 
 /* ---------- lists / tables ---------- */
-.rows{border:1px solid var(--line-soft);border-radius:8px;background:var(--surface);overflow:hidden}
+.rows{border:1px solid var(--line-soft);border-radius:var(--r-md);background:var(--surface);overflow:hidden}
 .rows .r{display:flex;align-items:baseline;gap:10px;padding:11px 13px;border-bottom:1px solid var(--line-soft);font-size:14px}
 .rows .r:last-child{border-bottom:0}
 .rows .r .d{font-family:var(--mono);font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums;min-width:52px}
 .rows .r .m{flex:1;min-width:0}
 .rows .r .x{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.rows .r button.del{font-family:var(--mono);font-size:11px;color:var(--dim);padding:2px 6px}
+.rows .r button.del{font-family:var(--mono);font-size:11.5px;color:var(--dim);min-height:var(--tap);padding:0 10px}
 
-.empty{border:1px dashed var(--line);border-radius:8px;padding:22px 16px;text-align:center;color:var(--muted);font-size:14px}
+.empty{border:1px dashed var(--line);border-radius:var(--r-md);padding:22px 16px;text-align:center;color:var(--muted);font-size:14px}
 .empty b{display:block;color:var(--ink);font-weight:600;margin-bottom:4px}
 
 /* ---------- program view ---------- */
@@ -372,14 +410,23 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
   text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--dim);font-weight:400;padding:0 8px 6px 0;border-bottom:1px solid var(--line);
 }
-.ptable td{padding:9px 8px 9px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.ptable tbody tr{cursor:pointer}
+.ptable tbody tr:active{background:var(--surface)}
+.ptable td{padding:12px 8px 12px 0;border-bottom:1px solid var(--line-soft);vertical-align:top}
 .ptable td:first-child{font-family:var(--mono);font-size:11px;color:var(--dim);width:16px;padding-top:11px}
 .ptable td.pres{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ptable .nt{display:block;font-size:12px;color:var(--dim);margin-top:2px;line-height:1.35}
-.phase-hd{display:flex;align-items:baseline;gap:9px;margin:26px 0 4px;padding-top:16px;border-top:1px solid var(--line)}
+.ptable .pname{
+  padding:0;text-align:left;font-weight:inherit;font-size:inherit;line-height:inherit;
+  border-bottom:1px dotted var(--dim);
+}
+.ptable .pname:active{color:var(--go);border-bottom-color:var(--go)}
+/* The blurb wraps under the title rather than right-aligning into a ragged
+   column beside it — at 390px the old layout read as a broken float. */
+.phase-hd{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:28px 0 6px;padding-top:16px;border-top:1px solid var(--line)}
 .phase-hd h3{margin:0;font-family:var(--mono);font-size:15px;letter-spacing:.1em;text-transform:uppercase}
-.phase-hd .now{font-family:var(--mono);font-size:9px;letter-spacing:.12em;background:var(--go);color:var(--bg);padding:2px 6px;border-radius:2px;font-weight:700}
-.phase-hd .span{font-size:12.5px;color:var(--dim);flex:1;text-align:right}
+.phase-hd .now{font-family:var(--mono);font-size:9px;letter-spacing:.12em;background:var(--go);color:var(--bg);padding:2px 6px;border-radius:3px;font-weight:700}
+.phase-hd .span{flex:1 0 100%;font-size:13px;color:var(--dim);line-height:1.45;margin-top:2px}
 .ref{border-left:2px solid var(--line);padding:0 0 0 13px;margin:0 0 16px}
 .ref h4{margin:0 0 3px;font-size:14px;font-weight:600}
 .ref p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.5}
@@ -387,10 +434,10 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
 /* ---------- data view ---------- */
 .field{display:flex;gap:8px;margin-bottom:10px}
 .field input,.field select{
-  flex:1;min-width:0;padding:12px;background:var(--surface);border:1px solid var(--line);
-  border-radius:6px;font-family:var(--mono);font-size:14px;
+  flex:1;min-width:0;min-height:var(--tap);padding:0 12px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-sm);font-family:var(--mono);font-size:14px;
 }
-.field button{padding:0 18px;border:1px solid var(--go);color:var(--go);border-radius:6px;font-family:var(--mono);font-size:12px;letter-spacing:.1em}
+.field button{min-height:var(--tap);padding:0 18px;border:1px solid var(--go);color:var(--go);border-radius:var(--r-sm);font-family:var(--mono);font-size:12px;letter-spacing:.1em}
 .hint{font-size:12.5px;color:var(--dim);margin:-4px 0 16px;line-height:1.45}
 
 /* ---------- bottom nav ---------- */
@@ -414,7 +461,7 @@ nav button[aria-current=page]{color:var(--go)}
 .sheet-in{
   width:100%;max-width:600px;max-height:88vh;overflow-y:auto;
   background:var(--bg);border:1px solid var(--line);border-bottom:0;
-  border-radius:14px 14px 0 0;
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
   padding:18px 16px calc(26px + env(safe-area-inset-bottom));
   animation:sheetUp .22s ease;
 }
@@ -425,13 +472,46 @@ nav button[aria-current=page]{color:var(--go)}
 .sheet-s{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:5px}
 .sheet-x{
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted);
-  border:1px solid var(--line);border-radius:5px;padding:8px 12px;white-space:nowrap;
+  border:1px solid var(--line);border-radius:var(--r-sm);min-height:var(--tap);padding:0 12px;white-space:nowrap;
 }
 .stat-row{display:flex;gap:8px;margin-bottom:14px}
 .stat{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:7px;background:var(--surface);padding:11px 8px;text-align:center}
 .stat .sv{font-family:var(--mono);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
 .stat .sk{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-top:6px}
 .hs{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+
+/* ---------- sheet tabs: how-to / history ---------- */
+/* One target on the card opens one sheet. Two unlabelled buttons 8px apart,
+   each opening a different panel, was a guessing game. */
+.sheet-tabs{display:flex;gap:6px;margin-bottom:18px}
+.sheet-tabs button{
+  flex:1;min-height:var(--tap);border:1px solid var(--line);border-radius:var(--r-sm);
+  background:var(--surface);color:var(--muted);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+}
+.sheet-tabs button[aria-selected=true]{
+  background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700;
+}
+
+/* ---------- how-to panel ---------- */
+.how-h{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);font-weight:700;margin:20px 0 8px;
+}
+.how-h:first-child{margin-top:0}
+.how-p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.6}
+.how-l{margin:0;padding-left:21px;font-size:14.5px;color:var(--muted);line-height:1.6}
+.how-l li{margin:0 0 8px}
+.how-l li:last-child{margin-bottom:0}
+.how-l li::marker{color:var(--dim);font-family:var(--mono);font-size:12px}
+.how-l.bad li::marker{color:var(--warn)}
+/* The prescription note is this session's variant, not the movement in
+   general — boxed so it doesn't read as more of the shared description. */
+.how-note{
+  margin:0;padding:11px 13px;border-left:2px solid var(--go);
+  background:rgba(63,201,174,.06);border-radius:0 var(--r-sm) var(--r-sm) 0;
+  font-size:13.5px;color:var(--ink);line-height:1.5;
+}
 
 /* ---------- toast ---------- */
 #toast{
@@ -1237,8 +1317,8 @@ function exCard(ex, i){
   nm.type = "button";
   nm.appendChild(el("span","ex-label", ex.name));
   if(ex.skill) nm.appendChild(el("span","ex-skill","Skill"));
-  nm.setAttribute("aria-label", "History for "+ex.name);
-  nm.onclick = ()=>openHistory(ex);
+  nm.setAttribute("aria-label", "How to do "+ex.name+", and history");
+  nm.onclick = ()=>openExercise(ex);
   hd.appendChild(nm);
   hd.appendChild(el("span","ex-target", targetStr(ex, entry.sets.length)));
   card.appendChild(hd);
@@ -1299,7 +1379,7 @@ function exCard(ex, i){
       cell.classList.remove("sugg");
       const a = cell.querySelector(".accept");
       if(a) a.remove();
-      paint(cell, v, ex);
+      paint(cell, v, ex, ghost);
       saveDraft(); syncSave(); syncEffort();
       if(ex.rest) startRest(ex.rest, ex.name+" · set "+(s+1)+" logged");
     };
@@ -1308,7 +1388,7 @@ function exCard(ex, i){
       const v = inp.value.replace(/[^0-9]/g,"").slice(0,3);
       if(inp.value!==v) inp.value=v;
       entry.sets[s] = v==="" ? null : parseInt(v,10);
-      paint(cell, entry.sets[s], ex);
+      paint(cell, entry.sets[s], ex, ghost);
       saveDraft(); syncSave(); syncEffort();
     };
     /* Rest starts when you leave a set you just changed — not when you tab
@@ -1320,6 +1400,7 @@ function exCard(ex, i){
         startRest(ex.rest, ex.name+" · set "+(s+1)+" logged");
       held = null;
     };
+    if(ghost!=null) cell.appendChild(el("div","mark"));
     cell.append(fill, inp);
 
     /* Most sets match last session, so the common case is one tap on the
@@ -1332,7 +1413,7 @@ function exCard(ex, i){
       acc.onclick = ()=>logSet(ghost);
       cell.appendChild(acc);
     }
-    paint(cell, entry.sets[s], ex);
+    paint(cell, entry.sets[s], ex, ghost);
     track.appendChild(cell);
   }
   card.appendChild(track);
@@ -1412,15 +1493,26 @@ function refreshCard(i){
   cards[i].replaceWith(exCard(draftPhase().sessions[pickedSession].exercises[i], i));
 }
 
-function paint(cell, val, ex){
-  cell.classList.remove("full","under","over");
-  const fill = cell.querySelector(".fill");
-  if(val==null){ fill.style.height="0"; return; }
+/* Where a rep count sits as a fraction of the cell's height. */
+function cellPct(v, ex){
   const span = Math.max(1, ex.max - ex.min);
-  const pct = Math.max(.08, Math.min(1, (val - ex.min + 1) / (span + 1)));
-  fill.style.height = (pct*100)+"%";
+  return Math.max(.08, Math.min(1, (v - ex.min + 1) / (span + 1)));
+}
+
+function paint(cell, val, ex, ghost){
+  cell.classList.remove("full","under","over","beat");
+  const fill = cell.querySelector(".fill");
+  const mark = cell.querySelector(".mark");
+
+  /* Last session's line sits at the height that number would fill to, so the
+     comparison is spatial — you see you're over it without reading digits. */
+  if(mark && ghost!=null) mark.style.bottom = (cellPct(ghost, ex)*100)+"%";
+
+  if(val==null){ fill.style.height="0"; return; }
+  fill.style.height = (cellPct(val, ex)*100)+"%";
   if(val >= ex.max) cell.classList.add("full");
   else cell.classList.add("under");
+  if(ghost!=null && val >= ghost) cell.classList.add("beat");
 }
 
 function syncSave(){
@@ -1496,13 +1588,10 @@ function saveSession(){
 }
 
 /* ============================================================
-   per-exercise history sheet
+   per-exercise sheet: how-to + history
    ============================================================ */
-function openHistory(ex){
-  const h = allHistory(ex.id);
-  const top = r => Math.max(...r.sets.filter(v=>v!=null).concat([0]));
-  const unit = ex.type==="hold" ? "s" : "";
-
+/* Sheet chrome — backdrop, escape-to-close, header. */
+function makeSheet(title, sub){
   const sheet = el("div","sheet");
   const inner = el("div","sheet-in");
 
@@ -1513,13 +1602,87 @@ function openHistory(ex){
 
   const hd = el("div","sheet-hd");
   const ttl = el("div");
-  ttl.appendChild(el("div","sheet-t", ex.name));
-  ttl.appendChild(el("div","sheet-s", targetStr(ex)+" · "+(ex.type==="hold"?"seconds":"reps")));
+  ttl.appendChild(el("div","sheet-t", title));
+  if(sub) ttl.appendChild(el("div","sheet-s", sub));
   hd.appendChild(ttl);
   const x = el("button","sheet-x","Close");
   x.onclick = close;
   hd.appendChild(x);
   inner.appendChild(hd);
+  sheet.appendChild(inner);
+
+  return { inner, open(){ document.body.appendChild(sheet); x.focus(); } };
+}
+
+/* How to actually perform the movement. The prescription is on the card; this
+   is what you'd otherwise have to remember from the document. */
+function howToPanel(ex){
+  const g = (P.howto || {})[ex.id];
+  const wrap = el("div");
+
+  if(g){
+    wrap.appendChild(el("h4","how-h","Set-up"));
+    wrap.appendChild(el("p","how-p", g.setup));
+
+    wrap.appendChild(el("h4","how-h","Execution"));
+    const ol = el("ol","how-l");
+    g.steps.forEach(t => ol.appendChild(el("li",null,t)));
+    wrap.appendChild(ol);
+
+    wrap.appendChild(el("h4","how-h","Common mistakes"));
+    const ul = el("ul","how-l bad");
+    g.mistakes.forEach(t => ul.appendChild(el("li",null,t)));
+    wrap.appendChild(ul);
+  }else{
+    wrap.appendChild(el("div","empty","No description written for this movement yet."));
+  }
+
+  /* The variant note is prescription-specific — weighted vs not, elevated vs
+     not — so it sits apart from the shared description. */
+  if(ex.note){
+    wrap.appendChild(el("h4","how-h","In this session"));
+    wrap.appendChild(el("p","how-note", ex.note));
+  }
+  return wrap;
+}
+
+/* One sheet, two panels. Opens on How to until there's something logged,
+   then on History — which is what you actually want once you're training. */
+function openExercise(ex, tab){
+  const h = allHistory(ex.id);
+  const s = makeSheet(ex.name, targetStr(ex)+" · "+(ex.type==="hold"?"seconds":"reps"));
+  const inner = s.inner;
+
+  const tabs = el("div","sheet-tabs");
+  tabs.setAttribute("role","tablist");
+  const body = el("div");
+  let active = tab || (h.length ? "history" : "howto");
+
+  const mk = (id, label) => {
+    const b = el("button", null, label);
+    b.type = "button";
+    b.setAttribute("role","tab");
+    b.onclick = ()=>{ active = id; paintTabs(); };
+    return b;
+  };
+  const btns = { howto: mk("howto","How to"), history: mk("history","History") };
+  tabs.append(btns.howto, btns.history);
+
+  const paintTabs = ()=>{
+    Object.entries(btns).forEach(([id,b]) => b.setAttribute("aria-selected", String(id===active)));
+    body.innerHTML = "";
+    body.appendChild(active==="howto" ? howToPanel(ex) : historyPanel(ex, h));
+  };
+
+  inner.append(tabs, body);
+  paintTabs();
+  s.open();
+}
+
+function historyPanel(ex, h){
+  const inner = el("div");
+  const top = r => Math.max(...r.sets.filter(v=>v!=null).concat([0]));
+  const unit = ex.type==="hold" ? "s" : "";
 
   const scored = scorable(ex) && everLoaded(ex.id);
   const score = r => Math.round(setScore(ex, top(r), r.load, r.date));
@@ -1568,9 +1731,7 @@ function openHistory(ex){
       "This movement appears in more than one session. Progression is judged separately for each, because the prescriptions differ."));
   }
 
-  sheet.appendChild(inner);
-  document.body.appendChild(sheet);
-  x.focus();
+  return inner;
 }
 
 /* ============================================================
@@ -2069,7 +2230,18 @@ function renderProgram(){
         const tr = document.createElement("tr");
         tr.appendChild(el("td",null,String(i+1)));
         const td = el("td");
-        td.appendChild(document.createTextNode(ex.name));
+        /* The button stays for keyboard and screen readers, but the click
+           handler lives on the row: at 21px tall the name alone is a bad
+           touch target, and padding it out would overlap the rows either
+           side. Enter on the button dispatches a click that bubbles here,
+           so both routes fire exactly once. */
+        const nb = el("button","pname", ex.name);
+        nb.type = "button";
+        nb.setAttribute("aria-label", "How to do "+ex.name);
+        td.appendChild(nb);
+        /* Reading the program is planning, not logging — open on the
+           description regardless of what's been logged. */
+        tr.onclick = ()=>openExercise(ex, "howto");
         if(ex.note) td.appendChild(el("span","nt", ex.note));
         tr.appendChild(td);
         tr.appendChild(el("td","pres", targetStr(ex)));
