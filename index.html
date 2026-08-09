@@ -181,6 +181,17 @@ button.ex-name:active .ex-label{color:var(--go);border-bottom-color:var(--go)}
   font-variant-numeric:tabular-nums;
 }
 .rest-btn:active{background:var(--surface2)}
+/* superset bracket — the pair reads as one block, not two exercises that happen to be adjacent */
+.sup{border-left:2px solid var(--line);padding-left:10px;margin:0 0 12px}
+.sup-hd{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.sup-k{
+  font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--bg);background:var(--muted);padding:1px 5px;border-radius:2px;
+}
+.sup-v{font-family:var(--mono);font-size:11px;color:var(--dim);font-variant-numeric:tabular-nums}
+.sup .ex{margin-bottom:8px}
+.sup .ex:last-child{margin-bottom:0}
+
 .ex-note{font-size:12.5px;color:var(--dim);margin:8px 0 0;line-height:1.4}
 .flag{
   display:flex;gap:8px;align-items:baseline;margin-top:9px;padding:8px 10px;
@@ -1116,7 +1127,7 @@ function renderToday(){
   }
 
   const warm = el("details","warm");
-  const sum = el("summary"); sum.appendChild(el("span",null,"Warm-up · 7 min"));
+  const sum = el("summary"); sum.appendChild(el("span",null,"Warm-up · 8 min"));
   warm.appendChild(sum);
   const ol = el("ol");
   P.warmup.forEach(w=>ol.appendChild(el("li",null,w)));
@@ -1125,7 +1136,7 @@ function renderToday(){
 
   const h = el("h2", null, sess.name); body.appendChild(h);
 
-  sess.exercises.forEach((ex,i)=>body.appendChild(exCard(ex,i)));
+  renderExercises(sess, body);
 
   body.appendChild(metaCard());
 
@@ -1184,6 +1195,34 @@ function metaCard(){
   t.oninput = ()=>{ draft.meta.note = t.value; saveDraft(); };
   c.append(l, t);
   return c;
+}
+
+/* Exercises sharing a group are alternated, not run straight through. That has to
+   be visible, because the rest each card shows is the alternation interval — half
+   of what the movement actually recovers. Groups are contiguous in program.json,
+   so document order still matches exercise index and refreshCard keeps working. */
+function renderExercises(sess, body){
+  let i = 0;
+  while(i < sess.exercises.length){
+    const g = sess.exercises[i].group;
+    let j = i;
+    if(g) while(j+1 < sess.exercises.length && sess.exercises[j+1].group === g) j++;
+
+    if(j > i){
+      const wrap = el("div","sup");
+      const hd = el("div","sup-hd");
+      const iv = sess.exercises[i].rest || 0;
+      hd.appendChild(el("span","sup-k","Alternate"));
+      if(iv) hd.appendChild(el("span","sup-v", mmss(iv)+" between · ≈"+mmss(iv*2)+" per movement"));
+      wrap.appendChild(hd);
+      for(let k=i;k<=j;k++) wrap.appendChild(exCard(sess.exercises[k], k));
+      body.appendChild(wrap);
+      i = j+1;
+    }else{
+      body.appendChild(exCard(sess.exercises[i], i));
+      i++;
+    }
+  }
 }
 
 function exCard(ex, i){

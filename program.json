@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "title": "12-Week Calisthenics Program",
+  "version": 2,
+  "title": "Calisthenics Program",
   "athlete": {
     "startPullups": 4,
     "startDips": 10,
@@ -8,25 +8,31 @@
     "heightCm": 174,
     "goal": "Muscle + aesthetics, handstand / L-sit / muscle-up"
   },
-  "week": ["rest", "upperA", "lower", "rest", "upperB", "lower", "rest"],
+  "week": ["rest", "upperA", "lower1", "rest", "upperB", "lower2", "rest"],
   "sessionNames": {
     "upperA": "Upper A",
     "upperB": "Upper B",
-    "lower": "Lower + Core",
+    "lower1": "Lower 1",
+    "lower2": "Lower 2",
     "rest": "Rest day"
   },
   "warmup": [
     "2 min easy cardio — jog in place, jumping jacks, skipping",
     "Arm circles ×10 each direction",
     "Band or towel shoulder dislocates ×10",
+    "Wrists: palms down rocks ×10 · palms up rocks ×10 · fist circles ×10 — before any handstand work",
     "Scapular pull-ups ×8 · scapular push-ups ×8",
     "10 bodyweight squats · 10 hip hinges · world's greatest stretch ×5/side",
-    "One light warm-up set of your first exercise"
+    "One light set of the first exercise, then a second at half your working load"
   ],
   "reference": [
     {
       "heading": "Double progression",
-      "body": "Stay at the same variation until you hit the top of the rep range on every set, two sessions in a row. Then add load (backpack) if possible, otherwise move to the harder variation. When you progress, you drop back to the bottom of the range. That's normal."
+      "body": "Stay at the same variation until you hit the top of the rep range on every set, two sessions in a row. Then add load (backpack) if possible, otherwise move to the harder variation. When you progress, you drop back to the bottom of the range. That's normal. One deliberate exception: Phase 1 pull-ups, which have their own rule written on the exercise."
+    },
+    {
+      "heading": "Supersets",
+      "body": "Exercises bracketed together alternate. Do one set of the first, wait the shown rest, one set of the second, wait, and repeat. Because the two movements don't compete, each one still gets roughly double the shown rest before its own next set — a 1:30 alternation gives every pull-up set about 3 minutes of recovery. This is what makes the session fit in 45 minutes without shortening anything that matters."
     },
     {
       "heading": "Effort",
@@ -34,23 +40,39 @@
     },
     {
       "heading": "Rest between sets",
-      "body": "2–3 minutes on the hard compound work. This will feel like too long. It isn't. Short rests are the main reason people get tired quickly and then stall — you end up limited by fatigue rather than strength, which is the wrong stimulus."
+      "body": "The timer shows the alternation interval, not your recovery. On the paired compound work each movement still gets 2–3 minutes before you repeat it. Don't cut it — short rests are the main reason people get tired quickly and then stall, because you end up limited by fatigue rather than strength, which is the wrong stimulus."
     },
     {
       "heading": "Order",
       "body": "Skill work goes first, right after the warm-up, when you're fresh. Never at the end."
     },
     {
+      "heading": "Adding the backpack",
+      "body": "Once you're loading a movement, don't go from the warm-up straight into a working set. Do one set at bodyweight and one at about half your working load first. It costs three minutes and it's the difference between elbows that tolerate weighted pull-ups and elbows that don't."
+    },
+    {
       "heading": "Advancing phases",
-      "body": "Never advance by calendar. Advance when you hit every criterion on the phase gate."
+      "body": "Never advance by calendar. Advance when you hit every criterion on the phase gate. The gates are the only clock in this program."
+    },
+    {
+      "heading": "Retesting",
+      "body": "Retest when you think you're close to a gate, not on a schedule. Fresh day, full warm-up, one all-out set of pull-ups, one of dips, one max wall handstand hold. Do the retest instead of that session's first exercise, not on top of it."
+    },
+    {
+      "heading": "Missed a session",
+      "body": "Take the sessions in order, not by weekday. If you miss Thursday, Upper B is simply what you do next. Never stack two sessions in a day to catch up, and never do the same session twice running to get back on the calendar — the order matters, the weekday doesn't. If you miss a whole week, repeat the last week's loads rather than picking up where the numbers left off."
     },
     {
       "heading": "Deload",
-      "body": "Every 6–8 weeks, or whenever your numbers go backwards two sessions in a row: one week at half the sets, same reps. Keep skill practice."
+      "body": "Every 6–8 weeks, or whenever your numbers go backwards three sessions running at the same load: one week at half the sets, same reps. Keep skill practice. Two bad sessions is noise — sleep, food, a cold bar. Three is a signal. Also deload if poor sleep, achy joints and flat motivation turn up together, whatever the numbers say."
     },
     {
       "heading": "Nutrition — the actual limiting factor",
-      "body": "At 66 kg, food is what's holding back muscle growth, not training. Eat ~250 kcal above maintenance, targeting 0.2–0.3 kg gained per month. If the scale hasn't moved in three weeks, eat more. Protein 110–130 g/day across 3–4 meals. Sleep 7–9 hours."
+      "body": "At 66 kg, food is what's holding back muscle growth, not training. Eat ~300–400 kcal above maintenance, targeting 0.4–0.7 kg gained per month — about 0.25–0.5% of bodyweight per week. Slower than that and you're leaving most of the result on the table; faster and you're mostly adding fat. If the scale hasn't moved in three weeks, eat more. Protein 110–130 g/day across 3–4 meals. Sleep 7–9 hours."
+    },
+    {
+      "heading": "Progressing a band",
+      "body": "Bands jump in big steps, so exhaust the small adjustments first: stand wider on the band, then choke up on it, then slow the lowering to 3 seconds. Move to a thicker band only when all three stop working."
     },
     {
       "heading": "Still getting tired quickly after 3 weeks?",
@@ -99,43 +121,54 @@
     {
       "id": "phase1",
       "name": "Phase 1",
-      "span": "Weeks 1–4, approximately",
+      "span": "Where you start. Leave when you clear the Phase 2 gate, however long that takes.",
       "gate": null,
       "sessions": {
         "upperA": {
           "name": "Upper A — pull emphasis",
           "exercises": [
-            { "id": "wallHandstand", "name": "Wall handstand", "sets": 4, "type": "hold", "min": 20, "max": 30, "rest": 60, "skill": true, "note": "Chest to wall. Stop before failure." },
-            { "id": "pullups", "name": "Pull-ups", "sets": 6, "type": "reps", "min": 2, "max": 3, "rest": 180, "loadable": true, "note": "Six clean doubles beats three ugly fives. Add one rep to one set each week: 2,2,2,2,2,2 → 3,2,2,2,2,2 → … At 6×3, retest your max." },
-            { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 5, "max": 6, "rest": 150, "loadable": true, "note": "Full range, controlled." },
-            { "id": "invertedRows", "name": "Inverted rows", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90, "note": "Park bar at hip height. Squeeze at the top." },
-            { "id": "pikePushups", "name": "Pike push-ups", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 90, "note": "Elevate the feet once this gets easy." },
-            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "note": "Superset with face pulls." },
-            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 45, "note": "Shoulder health and rear delts." }
+            { "id": "wallHandstand", "name": "Wall handstand", "sets": 4, "type": "hold", "min": 20, "max": 30, "rest": 60, "skill": true, "note": "Chest to wall. Stop before failure — this is practice, not a set." },
+            { "id": "pullups", "name": "Pull-ups", "sets": 6, "type": "reps", "min": 2, "max": 3, "rest": 75, "loadable": true, "group": "A", "note": "Exception to the progression rule: don't wait for all six sets. Add one rep to one set each week — 2,2,2,2,2,2 → 3,2,2,2,2,2 → 3,3,2,2,2,2. At 6×3, retest your max. Six clean doubles beats three ugly fives." },
+            { "id": "dips", "name": "Dips", "sets": 5, "type": "reps", "min": 5, "max": 6, "rest": 75, "loadable": true, "group": "A", "note": "Full range, controlled." },
+            { "id": "invertedRows", "name": "Inverted rows", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "B", "note": "Park bar at hip height. Squeeze at the top." },
+            { "id": "pikePushups", "name": "Pike push-ups", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 45, "group": "B", "note": "Elevate the feet once this gets easy." },
+            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 25, "group": "C", "note": "Elbows pinned to your sides. 2 seconds down." },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C", "note": "Elbows high, hands finish beside your ears. Not a progression lift — keep it at 15 quality reps." }
           ]
         },
-        "lower": {
-          "name": "Lower + Core",
+        "lower1": {
+          "name": "Lower 1 — squat emphasis",
           "exercises": [
             { "id": "tuckLsit", "name": "Tuck L-sit", "sets": 5, "type": "hold", "min": 10, "max": 15, "rest": 60, "skill": true, "note": "On dip bars or the floor." },
-            { "id": "bulgarian", "name": "Bulgarian split squat", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.85, "note": "Load the backpack once you pass 12." },
-            { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 5, "rest": 120, "note": "Or single-leg RDL 3×10/leg if you can't anchor your feet." },
-            { "id": "stepUps", "name": "Step-ups", "sets": 3, "type": "reps", "min": 10, "max": 12, "rest": 90, "perSide": true, "loadable": true, "bwFactor": 0.5, "note": "Knee height. Slow, no pushing off the back foot." },
-            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true, "note": "Full stretch at the bottom." },
-            { "id": "kneeRaises", "name": "Hanging knee raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "note": "No swinging." },
-            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 20, "max": 30, "rest": 60, "note": "Lower back stays pressed down." }
+            { "id": "bulgarian", "name": "Bulgarian split squat", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 75, "perSide": true, "loadable": true, "bwFactor": 0.85, "group": "A", "note": "Load the backpack once you pass 12." },
+            { "id": "kneeRaises", "name": "Hanging knee raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "group": "A", "note": "No swinging." },
+            { "id": "stepUps", "name": "Step-ups", "sets": 3, "type": "reps", "min": 10, "max": 12, "rest": 45, "perSide": true, "loadable": true, "bwFactor": 0.5, "group": "B", "note": "Knee height. Slow, no pushing off the back foot." },
+            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 20, "max": 30, "rest": 45, "group": "B", "note": "Lower back stays pressed down." },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true, "note": "Full stretch at the bottom." }
           ]
         },
         "upperB": {
           "name": "Upper B — push emphasis",
           "exercises": [
             { "id": "wallHandstand", "name": "Wall handstand + shoulder taps", "sets": 4, "type": "hold", "min": 20, "max": 30, "rest": 60, "skill": true, "note": "Add the taps once the hold is solid." },
-            { "id": "dips", "name": "Dips", "sets": 5, "type": "reps", "min": 5, "max": 5, "rest": 180, "loadable": true, "note": "Heavier day." },
-            { "id": "chinups", "name": "Chin-ups", "sets": 4, "type": "reps", "min": 3, "max": 3, "rest": 150, "loadable": true, "note": "Underhand. Easier than pull-ups — that's the point." },
-            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true, "bwFactor": 0.7, "note": "2 seconds down, 1 up." },
-            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
-            { "id": "diamondPushups", "name": "Diamond push-ups", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "note": "Triceps." },
-            { "id": "pullupNegatives", "name": "Pull-up negatives", "sets": 3, "type": "reps", "min": 3, "max": 3, "rest": 90, "note": "Jump up, lower over 5 s. Finisher." }
+            { "id": "dips", "name": "Dips", "sets": 5, "type": "reps", "min": 5, "max": 5, "rest": 75, "loadable": true, "group": "A", "note": "Heavier day — this is the one to load first." },
+            { "id": "chinups", "name": "Chin-ups", "sets": 5, "type": "reps", "min": 3, "max": 3, "rest": 75, "loadable": true, "group": "A", "note": "Underhand. Easier than pull-ups — that's the point." },
+            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 45, "loadable": true, "bwFactor": 0.7, "group": "B", "note": "2 seconds down, 1 up." },
+            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "B" },
+            { "id": "pullupNegatives", "name": "Pull-up negatives", "sets": 3, "type": "reps", "min": 3, "max": 3, "rest": 25, "group": "C", "note": "Jump up, lower over 5 s. This is what builds the pull-up at your level." },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C", "note": "Shoulder health and rear delts. Against this much pressing, it isn't optional." }
+          ]
+        },
+        "lower2": {
+          "name": "Lower 2 — hinge emphasis",
+          "exercises": [
+            { "id": "tuckLsit", "name": "Tuck L-sit", "sets": 4, "type": "hold", "min": 10, "max": 15, "rest": 45, "skill": true, "group": "A" },
+            { "id": "pikeCompression", "name": "Seated pike leg lifts", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "A", "note": "Sit legs straight, hands by your hips, lift the heels off the floor. Compression is what actually gates the L-sit, not core strength." },
+            { "id": "slRdl", "name": "Single-leg Romanian deadlift", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "perSide": true, "loadable": true, "bwFactor": 0.5, "group": "B", "note": "Hinge at the hip, back flat, feel the hamstring. Hold the backpack in the opposite hand once bodyweight is easy." },
+            { "id": "sidePlank", "name": "Side plank", "sets": 3, "type": "hold", "min": 20, "max": 30, "rest": 45, "perSide": true, "group": "B", "note": "Hips stacked and lifted. The only anti-rotation work in the program." },
+            { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 5, "rest": 45, "group": "C", "note": "Lower as slowly as you can, push back up with your hands." },
+            { "id": "kneeRaises", "name": "Hanging knee raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "C" },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true }
           ]
         }
       }
@@ -143,7 +176,7 @@
     {
       "id": "phase2",
       "name": "Phase 2",
-      "span": "Starts when you clear the Phase 2 gate",
+      "span": "Starts when you clear the Phase 2 gate.",
       "gate": {
         "name": "Phase 2 gate",
         "criteria": [
@@ -157,37 +190,48 @@
         "upperA": {
           "name": "Upper A — pull emphasis",
           "exercises": [
-            { "id": "wallHandstand", "name": "Wall handstand", "sets": 4, "type": "hold", "min": 30, "max": 45, "rest": 60, "skill": true, "note": "Chest to wall." },
-            { "id": "pullups", "name": "Pull-ups", "sets": 5, "type": "reps", "min": 3, "max": 5, "rest": 180, "loadable": true, "note": "Once you clear 5 on every set, start adding backpack weight." },
-            { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 150, "loadable": true, "note": "Add backpack weight when you clear 12." },
-            { "id": "invertedRows", "name": "Inverted rows", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
-            { "id": "pikePushups", "name": "Pike push-ups, feet elevated", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 90 },
-            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "note": "Superset with face pulls." },
-            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 45 }
+            { "id": "wallHandstand", "name": "Wall handstand", "sets": 3, "type": "hold", "min": 30, "max": 60, "rest": 60, "skill": true, "note": "Chest to wall. Three long holds, not four short ones. The Phase 3 gate is 60 s, so the range runs to it." },
+            { "id": "pullups", "name": "Pull-ups", "sets": 5, "type": "reps", "min": 3, "max": 5, "rest": 75, "loadable": true, "group": "A", "note": "Normal double progression now. Once you clear 5 on every set, start adding backpack weight." },
+            { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 75, "loadable": true, "group": "A", "note": "Add backpack weight when you clear 12." },
+            { "id": "invertedRows", "name": "Inverted rows", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "B" },
+            { "id": "pikePushups", "name": "Pike push-ups, feet elevated", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 45, "group": "B" },
+            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 25, "group": "C" },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C" }
           ]
         },
-        "lower": {
-          "name": "Lower + Core",
+        "lower1": {
+          "name": "Lower 1 — squat emphasis",
           "exercises": [
             { "id": "tuckLsitAdv", "name": "Advanced tuck L-sit", "sets": 5, "type": "hold", "min": 10, "max": 15, "rest": 60, "skill": true, "note": "Hips open more than a plain tuck." },
-            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.85 },
-            { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 6, "rest": 120 },
-            { "id": "pistolAssisted", "name": "Assisted pistol squat", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 120, "perSide": true, "note": "Box squat, to a lower and lower surface." },
-            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true },
-            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "note": "No swinging." },
-            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 25, "max": 40, "rest": 60 }
+            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 75, "perSide": true, "loadable": true, "bwFactor": 0.85, "group": "A" },
+            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 75, "group": "A", "note": "No swinging." },
+            { "id": "pistolAssisted", "name": "Assisted pistol squat", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 45, "perSide": true, "group": "B", "note": "Box squat, to a lower and lower surface." },
+            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 25, "max": 40, "rest": 45, "group": "B" },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true }
           ]
         },
         "upperB": {
           "name": "Upper B — push emphasis",
           "exercises": [
-            { "id": "handstandNegatives", "name": "Wall handstand negatives", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 90, "skill": true, "note": "Walk in close, lower slowly to your head, press back up." },
-            { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 180, "loadable": true, "note": "Heavier day — load this one first." },
-            { "id": "chinups", "name": "Chin-ups", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 150, "loadable": true },
-            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 90, "loadable": true, "bwFactor": 0.7 },
-            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
-            { "id": "archerPushups", "name": "Archer push-ups", "sets": 3, "type": "reps", "min": 6, "max": 8, "rest": 90, "perSide": true },
-            { "id": "pullupNegatives", "name": "Pull-up negatives", "sets": 3, "type": "reps", "min": 3, "max": 4, "rest": 90, "note": "Lower over 5 s. Finisher." }
+            { "id": "handstandNegatives", "name": "Wall handstand negatives", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 60, "skill": true, "note": "Walk in close, lower slowly to your head, press back up." },
+            { "id": "dips", "name": "Dips", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 75, "loadable": true, "group": "A", "note": "Heavier day — load this one first." },
+            { "id": "chinups", "name": "Chin-ups", "sets": 4, "type": "reps", "min": 3, "max": 5, "rest": 75, "loadable": true, "group": "A" },
+            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 15, "rest": 45, "loadable": true, "bwFactor": 0.7, "group": "B" },
+            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "B" },
+            { "id": "archerPushups", "name": "Archer push-ups", "sets": 3, "type": "reps", "min": 6, "max": 8, "rest": 25, "perSide": true, "group": "C" },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C" }
+          ]
+        },
+        "lower2": {
+          "name": "Lower 2 — hinge emphasis",
+          "exercises": [
+            { "id": "tuckLsitAdv", "name": "Advanced tuck L-sit", "sets": 4, "type": "hold", "min": 10, "max": 15, "rest": 45, "skill": true, "group": "A" },
+            { "id": "pikeCompression", "name": "Seated pike leg lifts", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 45, "group": "A" },
+            { "id": "slRdl", "name": "Single-leg Romanian deadlift, weighted", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "perSide": true, "loadable": true, "bwFactor": 0.5, "group": "B" },
+            { "id": "sidePlank", "name": "Side plank", "sets": 3, "type": "hold", "min": 25, "max": 40, "rest": 45, "perSide": true, "group": "B" },
+            { "id": "nordics", "name": "Nordic curl negatives", "sets": 3, "type": "reps", "min": 5, "max": 6, "rest": 45, "group": "C" },
+            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "C" },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true }
           ]
         }
       }
@@ -209,37 +253,49 @@
         "upperA": {
           "name": "Upper A — pull emphasis",
           "exercises": [
-            { "id": "freeHandstand", "name": "Free-standing handstand", "sets": 5, "type": "hold", "min": 5, "max": 20, "rest": 60, "skill": true, "note": "Kick-up practice against the wall, then away from it." },
-            { "id": "explosivePullups", "name": "Explosive pull-ups", "sets": 5, "type": "reps", "min": 3, "max": 3, "rest": 180, "note": "Chest to bar. Speed, not grind." },
-            { "id": "pullups", "name": "Weighted pull-ups", "sets": 4, "type": "reps", "min": 4, "max": 6, "rest": 180, "loadable": true, "note": "This is where most of the muscle comes from now." },
-            { "id": "straightBarDips", "name": "Straight-bar dips", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 150, "loadable": true, "note": "Harder than parallel bars, and the muscle-up needs them." },
-            { "id": "invertedRows", "name": "Inverted rows", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
-            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45 },
-            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 45 }
+            { "id": "freeHandstand", "name": "Free-standing handstand", "sets": 4, "type": "hold", "min": 5, "max": 20, "rest": 60, "skill": true, "note": "Kick-up practice against the wall, then away from it." },
+            { "id": "explosivePullups", "name": "Explosive pull-ups", "sets": 5, "type": "reps", "min": 3, "max": 3, "rest": 90, "note": "Chest to bar. Speed, not grind — stop the set the moment a rep slows down." },
+            { "id": "pullups", "name": "Weighted pull-ups", "sets": 4, "type": "reps", "min": 4, "max": 6, "rest": 75, "loadable": true, "group": "A", "note": "This is where most of the muscle comes from now." },
+            { "id": "straightBarDips", "name": "Straight-bar dips", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 75, "loadable": true, "group": "A", "note": "Harder than parallel bars, and the muscle-up needs them." },
+            { "id": "invertedRows", "name": "Inverted rows", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 25, "group": "C" },
+            { "id": "bandCurls", "name": "Band curls", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 25, "group": "C" },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C" }
           ]
         },
-        "lower": {
-          "name": "Lower + Core",
+        "lower1": {
+          "name": "Lower 1 — squat emphasis",
           "exercises": [
             { "id": "fullLsit", "name": "L-sit, one leg straight", "sets": 5, "type": "hold", "min": 8, "max": 15, "rest": 60, "skill": true, "note": "One leg straight, then both." },
-            { "id": "pistolSquats", "name": "Pistol squats", "sets": 4, "type": "reps", "min": 5, "max": 8, "rest": 120, "perSide": true, "loadable": true, "bwFactor": 0.9 },
-            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 120, "perSide": true, "loadable": true },
-            { "id": "nordics", "name": "Nordic curls", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 120 },
-            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 20, "rest": 60, "perSide": true, "loadable": true },
-            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 75 },
-            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 30, "max": 45, "rest": 60 }
+            { "id": "pistolSquats", "name": "Pistol squats", "sets": 4, "type": "reps", "min": 5, "max": 8, "rest": 75, "perSide": true, "loadable": true, "bwFactor": 0.9, "group": "A" },
+            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 75, "group": "A" },
+            { "id": "bulgarian", "name": "Bulgarian split squat, weighted", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 60, "perSide": true, "loadable": true, "bwFactor": 0.85, "group": "B" },
+            { "id": "hollowHold", "name": "Hollow body hold", "sets": 3, "type": "hold", "min": 30, "max": 45, "rest": 60, "group": "B" },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true, "loadable": true }
           ]
         },
         "upperB": {
           "name": "Upper B — push emphasis",
           "exercises": [
-            { "id": "freeHandstand", "name": "Free-standing handstand", "sets": 5, "type": "hold", "min": 5, "max": 20, "rest": 60, "skill": true },
-            { "id": "bandMuscleups", "name": "Band-assisted muscle-ups", "sets": 4, "type": "reps", "min": 3, "max": 3, "rest": 180, "skill": true, "note": "Focus on the transition, not the rep. Drop band thickness to progress." },
-            { "id": "dips", "name": "Weighted dips", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 180, "loadable": true },
-            { "id": "straightBarDips", "name": "Straight-bar dips", "sets": 3, "type": "reps", "min": 6, "max": 10, "rest": 150, "loadable": true },
-            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 90, "loadable": true },
-            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 3, "type": "reps", "min": 8, "max": 12, "rest": 90 },
-            { "id": "archerPushups", "name": "Archer push-ups", "sets": 3, "type": "reps", "min": 6, "max": 8, "rest": 90, "perSide": true }
+            { "id": "freeHandstand", "name": "Free-standing handstand", "sets": 3, "type": "hold", "min": 5, "max": 20, "rest": 60, "skill": true, "group": "S" },
+            { "id": "bandMuscleups", "name": "Band-assisted muscle-ups", "sets": 4, "type": "reps", "min": 3, "max": 3, "rest": 60, "skill": true, "group": "S", "note": "Focus on the transition, not the rep. Drop band thickness to progress." },
+            { "id": "dips", "name": "Weighted dips", "sets": 4, "type": "reps", "min": 6, "max": 10, "rest": 75, "loadable": true, "group": "A" },
+            { "id": "chinups", "name": "Weighted chin-ups", "sets": 4, "type": "reps", "min": 4, "max": 6, "rest": 75, "loadable": true, "group": "A" },
+            { "id": "pushupsElevated", "name": "Push-ups, feet elevated", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 45, "loadable": true, "bwFactor": 0.7, "group": "B" },
+            { "id": "invertedRowsElev", "name": "Inverted rows, feet elevated", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "group": "B" },
+            { "id": "archerPushups", "name": "Archer push-ups", "sets": 3, "type": "reps", "min": 6, "max": 8, "rest": 25, "perSide": true, "group": "C" },
+            { "id": "facePulls", "name": "Band face pulls", "sets": 3, "type": "reps", "min": 15, "max": 15, "rest": 25, "group": "C" }
+          ]
+        },
+        "lower2": {
+          "name": "Lower 2 — hinge emphasis",
+          "exercises": [
+            { "id": "fullLsit", "name": "L-sit, one leg straight", "sets": 4, "type": "hold", "min": 8, "max": 15, "rest": 45, "skill": true, "group": "A" },
+            { "id": "pikeCompression", "name": "Seated pike leg lifts", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "group": "A" },
+            { "id": "slRdl", "name": "Single-leg Romanian deadlift, weighted", "sets": 4, "type": "reps", "min": 8, "max": 12, "rest": 45, "perSide": true, "loadable": true, "bwFactor": 0.5, "group": "B" },
+            { "id": "sidePlank", "name": "Side plank", "sets": 3, "type": "hold", "min": 30, "max": 45, "rest": 45, "perSide": true, "group": "B" },
+            { "id": "nordics", "name": "Nordic curls", "sets": 3, "type": "reps", "min": 5, "max": 8, "rest": 45, "group": "C" },
+            { "id": "legRaises", "name": "Hanging straight leg raises", "sets": 3, "type": "reps", "min": 10, "max": 15, "rest": 45, "group": "C" },
+            { "id": "calfRaise", "name": "Single-leg calf raise", "sets": 3, "type": "reps", "min": 12, "max": 15, "rest": 45, "perSide": true, "loadable": true }
           ]
         }
       }

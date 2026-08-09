@@ -6,6 +6,7 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 
 ## What it does that a notes app doesn't
 
+- **Runs the session as supersets.** Paired exercises are bracketed together with the alternation interval, because the rest shown is the gap between movements, not your recovery — a 1:15 alternation gives each movement about 2:45. This is what fits the session into 45 minutes without shortening anything.
 - **One tap logs a set.** Each box is pre-filled with what you did in that set last session, shown dashed. Tap to log it as-is; tap again to type something different. Backpack load carries forward too. Scoped per session — Upper A dips and Upper B dips are prescribed differently, so their histories stay separate.
 - **Charts don't lie when you add weight.** Once an exercise has been logged with load, its chart switches from raw reps to estimated 1RM over bodyweight + backpack. Six bodyweight pull-ups becoming four at +10 kg is a rise from 79 to 86 kg, not the cliff a rep count would draw.
 - **Applies the double-progression rule.** When you hit the top of a rep range on every set, at the same load, two sessions in a row, the exercise turns amber and tells you to add weight or move to the harder variation.
@@ -27,14 +28,16 @@ No backend, no accounts, no build step. Data lives in your browser's `localStora
 | File | What it is |
 |---|---|
 | `index.html` | The whole app — markup, styles, logic |
-| `program.json` | The program as data: phases, sessions, exercises, rep ranges, rest times, gates |
+| `program.json` | The program as data: phases, sessions, exercises, rep ranges, rest times, supersets, gates |
 | `sw.js` | Offline cache |
 | `manifest.json`, `icon*.svg` | Add-to-home-screen metadata |
 | `PROGRAM.md` | The human-readable program |
 
 **`program.json` and `PROGRAM.md` are separate copies of the same program.** Editing one does not update the other. `program.json` is what the app reads.
 
-Phases 2 and 3 are written out in full in `program.json`. `PROGRAM.md` describes them as a list of changes to Phase 1, so those session lists are that description applied — worth reading once to check you agree with the interpretation, particularly the leg work.
+Both now write out all three phases in full, as four sessions each: Upper A, Lower 1, Upper B, Lower 2. Every row in `PROGRAM.md`'s tables — sets, rep range, rest and superset letter — is checked to match `program.json`, so if you edit one, edit the other.
+
+`PROGRAM.md` section 14 lists what changed from the original draft and why.
 
 ## Deploy to GitHub Pages
 
@@ -71,6 +74,9 @@ Edit `program.json`. Each exercise takes:
   "loadable": true,       // shows a +kg field, and enables e1RM charting
   "bwFactor": 1,          // share of bodyweight the movement carries; default 1
   "perSide": false,
+  "group": "A",           // alternate with adjacent exercises sharing this letter.
+                          // Members must be contiguous and share the same `rest`,
+                          // which is the alternation interval, not the recovery.
   "skill": true,          // adds the Skill tag
   "note": "…"
 }
